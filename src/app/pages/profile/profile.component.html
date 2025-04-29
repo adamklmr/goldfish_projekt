@@ -1,0 +1,49 @@
+<div class="profile-page-container">
+<div class="profile-container">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Saját profilom</mat-card-title>
+      </mat-card-header>
+  
+      <mat-card-content>
+        <div class="profile-info">
+          <div class="avatar-container">
+            <div class="avatar mat-elevation-z2">
+              {{ProfileObject[selectedIndex].avatar}}
+            </div>
+          </div>
+          <div class="user-details">
+            <h3 class="user-name">{{ProfileObject[selectedIndex].user_name}}</h3>
+            <div class="user-email">
+              <mat-icon>email</mat-icon>
+              <span>{{ProfileObject[selectedIndex].email}}</span>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="stats-section">
+          <h2>Statisztikáim</h2>
+          
+          <div class="stats-cards">
+            <mat-card class="stat-card">
+                <mat-card-header>
+                <mat-icon mat-card-avatar>assignment</mat-icon>
+                <mat-card-title>{{ProfileObject[selectedIndex].ordersNumber}}</mat-card-title>
+                <mat-card-subtitle>Rendelések száma</mat-card-subtitle>
+              </mat-card-header>
+            </mat-card>
+            
+            <mat-card class="stat-card">
+              <mat-card-header>
+                <mat-icon mat-card-avatar>done_all</mat-icon>
+                <mat-card-title>{{ProfileObject[selectedIndex].eventsNumber}}</mat-card-title>
+                <mat-card-subtitle>Események száma</mat-card-subtitle>
+              </mat-card-header>
+            </mat-card>
+        </div>
+      </div> <!-- Closing the stats-cards div -->
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

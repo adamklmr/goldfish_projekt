@@ -1,0 +1,169 @@
+<div class="admin-page">
+  <h1>Admin Oldal</h1>
+
+<div class="allForm-container">
+  <div class="form-container-products">
+      <h2>Termék hozzáadása</h2>
+      <form [formGroup]="productForm" (ngSubmit)="addProduct()" class="product-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Termék neve</mat-label>
+          <input matInput formControlName="productName" required />
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="category-select">
+          <mat-label>Kategória</mat-label>
+          <mat-select formControlName="productCategory">
+            <mat-option value="Felszerelés">Felszerelés</mat-option>
+            <mat-option value="Ruházat">Ruházat</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Ár</mat-label>
+          <input matInput formControlName="productPrice" type="number" required />
+        </mat-form-field>
+
+        <!-- <mat-form-field appearance="outline">
+          <mat-label>Product Image</mat-label>
+          <input type="file" (change)="onFileSelected($event)" />
+        </mat-form-field> -->
+
+        <mat-form-field appearance="outline">
+          <mat-label>Leírás</mat-label>
+          <textarea matInput formControlName="productDescription" required></textarea>
+        </mat-form-field>
+
+        <button mat-raised-button style="background-color: #58a7b3; color: white;" type="submit">Termék hozzáadása</button>
+      </form>
+  </div>
+
+  <div class="form-container-events">
+      <h2>Esemény hozzáadása</h2>
+      <form [formGroup]="eventForm" (ngSubmit)="addEvent()" class="event-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Esemény neve</mat-label>
+          <input matInput type="text" formControlName="eventName" required />
+        </mat-form-field>
+
+        <div class="time-container">
+          <mat-form-field>
+            <mat-label>Esemény kezdete (nap)</mat-label>
+            <input matInput [matDatepicker]="startDatepicker">
+            <mat-datepicker #startDatepicker></mat-datepicker>
+            <mat-datepicker-toggle [for]="startDatepicker" matSuffix></mat-datepicker-toggle>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Esemény vége (nap)</mat-label>
+            <input matInput [matDatepicker]="endDatepicker">
+            <mat-datepicker #endDatepicker></mat-datepicker>
+            <mat-datepicker-toggle [for]="endDatepicker" matSuffix></mat-datepicker-toggle>
+          </mat-form-field>
+        </div>
+        <mat-form-field appearance="outline">
+          <mat-label>Helyszín</mat-label>
+          <input matInput type="text" formControlName="eventLocation" required />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+
+          <mat-label>Leírás</mat-label>
+          <textarea matInput formControlName="eventDescription" required></textarea>
+        </mat-form-field>
+        <button mat-raised-button style="background-color: #58a7b3; color: white;" type="submit">Esemény hozzáadása</button>
+      </form>
+    </div>
+</div>
+<div class="list-category">
+<form [formGroup]="form">
+  <mat-form-field appearance="outline" class="category-select-table">
+    <mat-label>Listázandó elemek</mat-label>
+    <mat-select formControlName="listingItem">
+      <mat-option value="products">Termékek</mat-option>
+      <mat-option value="events">Események</mat-option>
+    </mat-select>
+  </mat-form-field>
+</form>
+</div>
+<div class="table-container">
+        @if (form.get('listingItem')?.value === 'products') {
+        <h2>Termékek listázása</h2>
+      <div class="list-container">
+        <table mat-table [dataSource]="products" class="mat-elevation-z8">
+          <ng-container matColumnDef="instock">
+            <th mat-header-cell *matHeaderCellDef>Készleten</th>
+            <td mat-cell *matCellDef="let product">
+              <mat-checkbox 
+                [checked]="product.instock" 
+                (change)="toggleProductCompletion(product)"
+                color="primary">
+              </mat-checkbox>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef> Név </th>
+            <td mat-cell *matCellDef="let product"> {{ product.name }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="category">
+            <th mat-header-cell *matHeaderCellDef> Kategória </th>
+            <td mat-cell *matCellDef="let product"> {{ product.category }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="price">
+            <th mat-header-cell *matHeaderCellDef> Ár </th>
+              <td mat-cell *matCellDef="let product"> {{ product.price | currencyPipe}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef> Leírás </th>
+            <td mat-cell *matCellDef="let product"> {{ product.description }} </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="ProductsdisplayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: ProductsdisplayedColumns;"></tr>
+        </table>
+        <mat-paginator [pageSizeOptions]="[5, 10, 20]"
+                 showFirstLastButtons
+                 aria-label="Select page of periodic elements">
+  </mat-paginator>
+      </div>
+    }
+    @if (form.get('listingItem')?.value === 'events') {
+          <h2 class="list-h2">Események listázása</h2>
+          <div class="list-container">
+            <table mat-table [dataSource]="events" class="mat-elevation-z8">
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> Név </th>
+                <td mat-cell *matCellDef="let event"> {{ event.name }} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="startDate">
+                <th mat-header-cell *matHeaderCellDef> Kezdete </th>
+                <td mat-cell *matCellDef="let event"> {{ event.startDate | datePipe }} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="endDate">
+                <th mat-header-cell *matHeaderCellDef> Vége </th>
+                <td mat-cell *matCellDef="let event"> {{ event.endDate | datePipe }} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="location">
+                <th mat-header-cell *matHeaderCellDef> Helyszín </th>
+                <td mat-cell *matCellDef="let event"> {{ event.location }} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef> Leírás </th>
+                <td mat-cell *matCellDef="let event"> {{ event.description }} </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="EventsdisplayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: EventsdisplayedColumns;"></tr>
+            </table>
+            <mat-paginator [pageSizeOptions]="[5, 10, 20]"
+                 showFirstLastButtons
+                 aria-label="Select page of periodic elements">
+  </mat-paginator>
+          </div>
+        }
+</div>
+</div>

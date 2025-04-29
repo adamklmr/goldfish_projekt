@@ -1,0 +1,73 @@
+
+<header>
+  <mat-sidenav-container>
+    <mat-sidenav #sidenav>
+      <app-menu [sidenav]="sidenav"></app-menu>
+    
+    </mat-sidenav>
+  <mat-sidenav-content>
+
+    <mat-toolbar>
+      <button 
+        mat-button 
+        (click)="onToggleSidenav(sidenav)"
+        class="menu-toggle-button">
+        <mat-icon>menu</mat-icon>
+      </button>
+        <a class="logo-container" routerLink="/home">
+          <img class="logo" src="../assets/images/logo3.png" alt="Logo">
+        </a>
+      <nav> 
+        <ul class="menu-container">
+          <li><a routerLink="/products">Termékek</a></li>
+          <li><a routerLink="/events">Események</a></li>
+          @if (isAdmin) {
+            <li class="admin-sidenav"><a routerLink="/admin">Admin oldal</a></li>
+          }
+          @if (isLoggedIn) {
+          <li class="profile-sidenav"><a routerLink="/profile">Profil</a></li>
+          <li class="login-sidenav"><a mat-list-item (click)="logout()">Kijelentkezés</a></li>
+          }@if(!isLoggedIn) {
+          <li class="logout-sidenav"><a routerLink="/login">Bejelentkezés</a></li>
+          }
+        </ul>
+        <div class="search-bar-container">
+          <input id="search-bar" type="search">
+          <mat-icon id="search-icon">search</mat-icon>
+        </div>
+        <div class="icon-container">
+           <div class="dropdown">
+            @if (isLoggedIn) {
+              <mat-icon id="profile-icon" routerLink="/profile">person</mat-icon>
+            }
+            @else {<mat-icon id="profile-icon" routerLink="/login">person</mat-icon>}
+              <div class="dropdown-menu">
+                @if (!isLoggedIn){
+                  <a class="drop-item" routerLink="/login">Bejelentkezés</a>
+                  <a class="drop-item" routerLink="/signup">Regisztráció</a>
+                }@else{
+                  <a class="drop-item" mat-list-item (click)="logout()">Kijelentkezés</a>
+                } 
+
+              </div>
+           </div>
+           @if (isLoggedIn) {
+            <mat-icon id="cart-icon" routerLink="/cart">shopping_cart</mat-icon>
+           }
+           @else {
+            <mat-icon id="cart-icon" routerLink="/login">shopping_cart</mat-icon>
+           }
+            @if (isAdmin) {
+              <mat-icon id="admin-icon" routerLink="/admin">shield</mat-icon>
+            }
+        </div> 
+      </nav>
+    </mat-toolbar>
+    <router-outlet />
+  </mat-sidenav-content>
+  </mat-sidenav-container>
+</header>
+
+<footer>
+  <p>&copy; 2025 Goldfish Shop</p>
+</footer>

@@ -1,0 +1,73 @@
+import { Component, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { MenuComponent } from './shared/menu/menu.component';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { RouterLink } from '@angular/router';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { AuthService } from './shared/services/auth.service';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { Subscription } from 'rxjs';
+
+
+
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    MatSidenavModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatIconModule,
+    MatFormFieldModule,
+    RouterLink,
+    MenuComponent,
+    
+  ],
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss']
+})
+export class AppComponent implements OnInit,OnDestroy {
+  title = 'goldfish';
+  isLoggedIn = false;
+  isAdmin = false;
+  private authSubscription?: Subscription;
+
+  constructor(private authService: AuthService) {}
+
+  ngOnInit(): void {
+    this.authSubscription = this.authService.currentUser.subscribe(user => {
+      this.isLoggedIn = !!user;
+      localStorage.setItem('isLoggedIn', this.isLoggedIn ? 'true' : 'false');
+    });
+  }
+  ngOnDestroy(): void {
+    this.authSubscription?.unsubscribe();
+  }
+  
+  // updateAuthStatus(): void {
+  //   if (isPlatformBrowser(this.platformId)) {
+  //     const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  //     this.isLoggedIn = loggedIn;
+  //     this.isAdmin = loggedIn && (localStorage.getItem('isAdmin') === 'true');
+  //   } else {
+  //     this.isLoggedIn = false;
+  //     this.isAdmin = false;
+  //   }
+    
+  // }
+  
+  logout(): void {
+    this.authService.signOut();
+  }
+  
+
+  onToggleSidenav(sidenav: MatSidenav){
+    sidenav.toggle();
+  }
+}

@@ -1,0 +1,32 @@
+h2{
+    text-align: center;
+}
+.allForm-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+.form-container{
+    display: flex;
+    flex-direction: column;
+}
+.product-form,.event-form{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.list-category{
+    margin-left: 20px;
+}
+.table-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+.list-container{
+    border: 1px solid black;
+}

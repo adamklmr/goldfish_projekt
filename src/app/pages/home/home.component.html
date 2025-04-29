@@ -1,0 +1,55 @@
+<div class="home-page-container">
+    <h1>Néhány termékünk</h1>
+    <div class="products-container">
+        @for (product of ProductObject; track $index) {
+            <div class="product-card">
+                <mat-card>
+                    <div class="product-image">
+                    <img mat-card-image [src]="ProductObject[$index].pic" alt="{{ProductObject[$index].name}}">
+                    </div>
+                    <div class="card-header">
+                    <mat-card-header>
+                        <mat-card-title>{{ProductObject[$index].name}}</mat-card-title>
+                        <!-- <mat-card-subtitle>{{ProductObject[$index].category}}</mat-card-subtitle> -->
+                      </mat-card-header>
+                    </div>
+                    <div class="overlay">
+                        <mat-card-content>
+                            <p>{{ProductObject[$index].description}}</p>
+                            <p><strong>Ár:</strong> {{ProductObject[$index].price | currencyPipe}}</p>
+                          </mat-card-content>
+                          <mat-card-actions>
+                            <button mat-flat-button>Kosárba</button>
+                          </mat-card-actions>
+                    </div>
+                </mat-card>
+              </div>
+        }
+        </div>
+    <h1>Néhány eseményünk</h1>
+    <div class="events-container">
+        @for (event of EventObject; track $index) {
+            <div class="event-card">
+                <mat-card>
+                    <div class="event-image">
+                    <img mat-card-image [src]="EventObject[$index].pic" alt="{{EventObject[$index].name}}">
+                    </div>
+                    <mat-card-header>
+                        <mat-card-title>{{EventObject[$index].name}}</mat-card-title>
+                      </mat-card-header>
+                        <mat-card-content>
+                            <p>{{EventObject[$index].description}}</p>
+                            <p><strong>Helyszín:</strong> {{EventObject[$index].location}}</p>
+                            <p><strong>Kezdés:</strong> {{EventObject[$index].startDate | date:'yyyy-MM-dd'}}</p>
+                            <p><strong>Vége:</strong> {{EventObject[$index].endDate | date:'yyyy-MM-dd'}}</p>
+                          </mat-card-content>
+                          <mat-card-actions>
+                            <button mat-flat-button
+                            [ngClass]="{ 'disabled-button': hasStarted(event.startDate) }" 
+                            [disabled]="hasStarted(event.startDate)">Érdekel</button>
+                          </mat-card-actions>
+                </mat-card>
+            </div>
+        }
+
+</div>

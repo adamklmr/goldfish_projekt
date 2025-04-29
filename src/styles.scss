@@ -1,0 +1,47 @@
+@use '@angular/material' as mat;
+
+:root {
+  @include mat.sidenav-overrides((
+    content-background-color: 	white,
+    container-text-color: #438797,
+  ));
+  @include mat.button-overrides((
+    filled-container-color: 	#438797,
+    filled-label-text-color: white,
+  ));
+  @include mat.table-overrides((
+    background-color: white,
+    header-headline-color: black,
+  ));
+
+  @include mat.icon-overrides((
+    color: #438797,
+  ));
+  @include mat.paginator-overrides((
+    container-text-color: white,
+    container-background-color: #58a7b3,
+    enabled-icon-color: white,
+    disabled-icon-color: white,
+  ));
+  @include mat.select-overrides((
+    focused-arrow-color: #58a7b3,
+    invalid-arrow-color: #58a7b3,
+  ));
+  @include mat.checkbox-overrides((
+    selected-icon-color: #58a7b3,
+    selected-hover-icon-color: #438797,
+    selected-focus-icon-color: #438797,
+  ));
+  @include mat.datepicker-overrides((
+    calendar-date-selected-state-text-color: white,
+    calendar-date-selected-state-background-color: #58a7b3,
+    calendar-date-today-outline-color: #58a7b3,
+  ));
+}
+body {
+  margin: 0 !important;
+}
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;}
+
+

@@ -1,0 +1,49 @@
+<div class="product-page-container">
+<h1>Az oldalon található öszes termék   </h1>
+<div class="filter-container">
+  <label for="maxPrice">Maximális ár (Ft):</label>
+  <input matInput placeholder="Ide írd a maximális árat"
+    type="number"
+    id="maxPrice"
+    min="0"
+    [(ngModel)]="maxPrice"
+    
+  >
+  <!-- <mat-form-field>
+  <mat-label>Kategória:</mat-label>
+    <mat-select id="categoryFilter" [(ngModel)]="selectedCategory">
+      @for (c of categories; track $index) {
+        <mat-option [value]="$index">{{$index}}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field> -->
+  <button mat-flat-button (click)="getFilteredProducts()">Szűrés</button>
+
+</div>
+<div class="products-container">
+  @for (product of filteredProducts; track $index) {
+      <div class="product-card">
+          <mat-card>
+              <div class="product-image">
+              <img mat-card-image [src]="filteredProducts[$index].pic" alt="{{filteredProducts[$index].name}}">
+              </div>
+              <div class="card-header">
+              <mat-card-header>
+                  <mat-card-title>{{filteredProducts[$index].name}}</mat-card-title>
+                  <!-- <mat-card-subtitle>{{ProductObject[$index].category}}</mat-card-subtitle> -->
+                </mat-card-header>
+              </div>
+              <div class="overlay">
+                  <mat-card-content>
+                      <p>{{filteredProducts[$index].description}}</p>
+                      <p><strong>Ár:</strong> {{filteredProducts[$index].price}} Ft</p>
+                    </mat-card-content>
+                    <mat-card-actions>
+                      <button mat-flat-button>Kosárba</button>
+                    </mat-card-actions>
+              </div>
+          </mat-card>
+        </div>
+  }
+  </div>
+</div>
