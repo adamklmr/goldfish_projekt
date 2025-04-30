@@ -6,7 +6,7 @@ export const routes: Routes = [
     {
         path: 'home',
         loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent)
-        , canActivate: [publicGuard]
+        // , canActivate: [publicGuard]
     },
     {
         path: 'admin',
@@ -21,27 +21,27 @@ export const routes: Routes = [
     {
         path: 'login',
         loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent)
-        , canActivate: [publicGuard]
+        // , canActivate: [publicGuard]
     },
     {
         path: 'signup',
         loadComponent: () => import('./pages/signup/signup.component').then(m => m.SignupComponent)
-        , canActivate: [publicGuard]
+        // , canActivate: [publicGuard]
     },
     {
         path: 'products',
         loadComponent: () => import('./pages/products/products.component').then(m => m.ProductsComponent)
-        , canActivate: [publicGuard]
+        // , canActivate: [publicGuard]
     },
     {
         path: 'events',
         loadComponent: () => import('./pages/events/events.component').then(m => m.EventsComponent)
-        ,canActivate: [publicGuard]
+        // ,canActivate: [publicGuard]
     },
     {
         path: 'cart',
         loadComponent: () => import('./pages/cart/cart.component').then(m => m.CartComponent)
-        ,canActivate: [authGuard]
+             ,canActivate: [authGuard]
     },
     
     {
