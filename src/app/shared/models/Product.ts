@@ -15,7 +15,7 @@ export interface Product {
       'instock': true,
       'price': 12000,
       'pic': '../../../assets/images/products/orso.jpg',
-      'description': 'Carp Expert Uni Runner 6000 nyeletőfékes orsó'
+      'description': '  '
     },
     {
       'id': 2,

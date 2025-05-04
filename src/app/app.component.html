@@ -32,8 +32,19 @@
           }
         </ul>
         <div class="search-bar-container">
-          <input id="search-bar" type="search">
-          <mat-icon id="search-icon">search</mat-icon>
+          <mat-form-field class="form-search" appearance="fill">
+            <mat-label>Keresés...</mat-label>
+          <input 
+            type="search"
+            matInput 
+            [(ngModel)]="searchQuery">
+          <button 
+            mat-icon-button 
+            class="search-button" 
+            (click)="onSearch()">
+            <mat-icon>search</mat-icon>
+          </button>
+        </mat-form-field>
         </div>
         <div class="icon-container">
            <div class="dropdown">
@@ -55,7 +66,7 @@
             <mat-icon id="cart-icon" routerLink="/cart">shopping_cart</mat-icon>
            }
            @else {
-            <mat-icon id="cart-icon" routerLink="/login">shopping_cart</mat-icon>
+            
            }
             @if (isAdmin) {
               <mat-icon id="admin-icon" routerLink="/admin">shield</mat-icon>

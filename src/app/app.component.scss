@@ -1,7 +1,9 @@
 nav {
     display: flex;
-    width: 100%;
-    justify-content: space-between;
+    max-width: 100%;
+    max-height: 64px;
+    justify-content: space-around;
+    
 }
 ul{
     padding-left:0px;
@@ -71,25 +73,63 @@ mat-toolbar{
 .menu-toggle-button {
     display: none;
 }
+.search-bar-container {
+    display: flex;
+    align-items: center;
+    padding-left: 50px;
+    max-height: 100%;
+    width: 300px;
+    // margin-right: 350px;
 
-@media (max-width: 916px) {
-    .menu-toggle-button {
-        display: flex;
-        align-items: left;
-        
-    }
-    
-    .search-bar-container {
-        padding: 4px 10px;
-        justify-content: center;
-        input {
-          font-size: 14px;
+    .form-search {
+        max-height: 70%;
+        ::ng-deep .mat-mdc-form-field-infix {
+          padding: 0px 0px; // Módosítsd a padding értékét igény szerint
+          width: 250px;
         }
-    }
-    #profile-icon, #cart-icon, #admin-icon{
-        display:none;
-    }
-}
+        ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+            display: none;
+        }
+        ::ng-deep .mat-mdc-text-field-wrapper.mdc-text-field.mdc-text-field--filled{
+            
+            padding: 0px 0px;
+            background-color: white;
+            border-radius: 5px;
+            &::after {
+                background-color: #204d57;
+            }
+        }
+        ::ng-deep input{
+            padding-left: 10px;
+            padding-top: 20px;
+        }
+        ::ng-deep mat-label{
+            padding-left: 10px;
+        }
+      }
+}  
+::ng-deep .search-bar-container .form-search {
+    padding: 0px;
+  }
+  
+// @media (max-width: 916px) {
+//     .menu-toggle-button {
+//         display: flex;
+//         align-items: left;
+        
+//     }
+    
+//     .search-bar-container {
+//         padding: 4px 10px;
+//         justify-content: center;
+//         input {
+//           font-size: 14px;
+//         }
+//     }
+//     #profile-icon, #cart-icon, #admin-icon{
+//         display:none;
+//     }
+// }
 @media (max-width: 904px) {
     .menu-container {
         display: none;
@@ -100,11 +140,12 @@ mat-toolbar{
         width: 100%;
     }
     .search-bar-container{
-        width: 70%;
+        margin-right: 30px;
     }
     .profile-sidenav,.login-sidenav,.logout-sidenav,.admin-sidenav{
         display: flex;
     }
+
 }
 @media (min-width: 905px) {
     .profile-sidenav,.login-sidenav,.logout-sidenav,.admin-sidenav{
@@ -137,13 +178,6 @@ mat-toolbar{
     }
 }
 
-.search-bar-container {
-    display: flex;
-    justify-content: center;
-    //border: 1px solid black;
-    align-items: center;
-    border-radius: 10px;
-}
 .icon-container{
     //margin-left: 100px;
     display: flex;
@@ -228,15 +262,8 @@ mat-toolbar{
         text-align: center;
     }
 }
-#profile-icon{
+#profile-icon,#cart-icon,#admin-icon{
     font-size: 25px;
-}
-#cart-icon{
-    font-size: 25px;
-}
-#admin-icon{
-    font-size: 25px;
-
 }
 footer {
     background-color: #438797;
