@@ -1,10 +1,10 @@
 import { DatePipe } from "@angular/common";
 
 export interface Event {
-    id: number;
+    id: string;
     name: string;
-    startDate: Date;
-    endDate: Date;
+    startDate: string;
+    endDate: string;
     location: string;
     pic: string;
     description?: string;

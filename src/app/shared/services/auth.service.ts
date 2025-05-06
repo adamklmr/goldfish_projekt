@@ -4,24 +4,36 @@ import {
   signInWithEmailAndPassword,
   signOut,
   authState,
-  User,
-  UserCredential
+  User as FirebaseUser,
+  UserCredential,
+  createUserWithEmailAndPassword
 } from '@angular/fire/auth';
+import { 
+  Firestore, 
+  collection, 
+  doc, 
+  setDoc 
+} from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { User } from '../models/User';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  currentUser: Observable<User | null>;
+  currentUser: Observable<FirebaseUser | null>;
   
   constructor(
     private auth: Auth,
+    private firestore: Firestore,
     private router: Router
   ) {
     this.currentUser = authState(this.auth);
+  }
+  isAdmin(): boolean {
+    const user = this.auth.currentUser;
+    return user?.email === 'admin@gmail.com';
   }
   
   signIn(email: string, password: string): Promise<UserCredential> {
@@ -35,39 +47,39 @@ export class AuthService {
     });
   }
   
-  isLoggedIn(): Observable<User | null> {
-    return this.currentUser;
+  async signUp(email: string, password: string, userData: Partial<User>): Promise<UserCredential> {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        this.auth, 
+        email, 
+        password
+      );
+      
+      await this.createUserData(userCredential.user.uid, {
+        ...userData,
+        id: userCredential.user.uid,
+        email: email,
+        products: [],
+        events: []
+      });
+
+      return userCredential;
+    } catch (error) {
+      console.error('Hiba a regisztráció során:', error);
+      throw error;
+    }
+  }
+
+  private async createUserData(userId: string, userData: Partial<User>): Promise<void> {
+    const userRef = doc(collection(this.firestore, 'users'), userId);
+    
+    return setDoc(userRef, userData);
   }
   
+  isLoggedIn(): Observable<FirebaseUser | null> {
+    return this.currentUser;
+  }
   updateLoginStatus(isLoggedIn: boolean): void {
     localStorage.setItem('isLoggedIn', isLoggedIn ? 'true' : 'false');
   }
-
-  signup(email: string, password: string) {
-    return createUserWithEmailAndPassword(this.auth, email, password);
-  }
-
-  // async checkAdminStatus(): Promise<boolean> {
-  //   const user: User | null = this.auth.currentUser;
-  //   if (user) {
-  //     await user.getIdToken(true); // Force refresh the token
-  //     const idTokenResult = await getIdTokenResult(user);
-
-  //     console.log('checkAdminStatus: role =', idTokenResult.claims['role']);
-  //     return idTokenResult.claims['role'] === 'admin'; // Assuming 'role' is stored in custom claims
-  //   }
-  //   return false;
-  // }
-
-  // isLoggedIn(): boolean {
-  //   const isBrowser = typeof window !== 'undefined' && typeof localStorage !== 'undefined';
-  //   console.log(localStorage.getItem('isLoggedIn')); // Should be 'true'
-  //   return isBrowser ? localStorage.getItem('isLoggedIn') === 'true' : false;
-  // }
-
-  // isAdmin(): boolean {
-  //   const isBrowser = typeof window !== 'undefined' && typeof localStorage !== 'undefined';
-  //   console.log(localStorage.getItem('isAdmin')); // Should be 'true'
-  //   return isBrowser ? localStorage.getItem('isAdmin') === 'true' : false;
-  // }
 }

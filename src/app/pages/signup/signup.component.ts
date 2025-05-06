@@ -36,92 +36,70 @@ export class SignupComponent {
       lastname: new FormControl('', [Validators.required, Validators.minLength(2)])
     })
   });
-  
+
   isLoading = false;
   showForm = true;
   signupError = '';
 
-  constructor(private router: Router, private authService: AuthService ) {}
-//elso merfoldko
-  // signup(): void {
-  //   if (this.signUpForm.invalid) {
-  //     this.signupError = 'Kérlek ellenőrizd a megadott adatokat!';
-  //     return;
-  //   }
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
-  //   const password = this.signUpForm.get('password');
-  //   const rePassword = this.signUpForm.get('rePassword');
-
-  //   if (password?.value !== rePassword?.value) {
-  //     return;
-  //   }
-
-  //   this.isLoading = true;
-  //   this.showForm = false;
-
-  //   const newUser: User = {
-  //     id: Math.random().toString(36).substring(2, 15),
-  //     name: {
-  //       firstname: this.signUpForm.value.name?.firstname || '',
-  //       lastname: this.signUpForm.value.name?.lastname || ''
-  //     },
-  //     email: this.signUpForm.value.email || '',
-  //     password: this.signUpForm.value.password || '',
-  //     ordersNumber: 0,
-  //     eventsNumber: 0,
-
-  //   };
-  //   localStorage.setItem('isLoggedIn', 'true');
-  //     localStorage.setItem('isAdmin', 'false');
-  //     window.location.href = '/home';
-  //   console.log('New user:', newUser);
-  //   console.log('Form value:', this.signUpForm.value);
-
-  //   // setTimeout(() => {
-  //   //   this.router.navigateByUrl('/home');
-  //   // }, 2000);
-  // }
   signup(): void {
     if (this.signUpForm.invalid) {
-      this.signupError = 'Kérlek ellenőrizd a megadott adatokat!';
+      this.signupError = 'Please correct any errors on the form before submitting.';
       return;
     }
 
-    const password = this.signUpForm.get('password');
-    const rePassword = this.signUpForm.get('rePassword');
-
-    if (password?.value !== rePassword?.value) {
-      this.signupError = 'A jelszavak nem egyeznek!';
+    const password = this.signUpForm.get('password')?.value;
+    const rePassword = this.signUpForm.get('rePassword')?.value;
+    
+    if (password !== rePassword) {
+      this.signupError = 'The passwords do not match.';
       return;
     }
 
     this.isLoading = true;
     this.showForm = false;
 
-    const newUser: User = {
-      id: Math.random().toString(36).substring(2, 15),
+    const userData: Partial<User> = {
       name: {
         firstname: this.signUpForm.value.name?.firstname || '',
         lastname: this.signUpForm.value.name?.lastname || ''
       },
       email: this.signUpForm.value.email || '',
-      password: this.signUpForm.value.password || '',
-      ordersNumber: 0,
-      eventsNumber: 0,
+      products: [],
+      events: []
     };
 
-    this.authService.signup(newUser.email, newUser.password).then(() => {
-      localStorage.setItem('isLoggedIn', 'true');
-      this.router.navigateByUrl('/home');
-    }).catch((err) => {
-      if (err.code === 'auth/email-already-in-use') {
-        this.signupError = 'Ez az email cím már használatban van!';
-      } else {
-        this.signupError = 'Hiba történt a regisztráció során!';
-      }
-      console.error(err);
-      this.isLoading = false;
-      this.showForm = true;
-    });
-}
+    const email = this.signUpForm.value.email || '';
+    const pw = this.signUpForm.value.password || '';
+
+    this.authService.signUp(email, pw, userData)
+      .then(userCredential => {
+        console.log('Registration succesful:', userCredential.user);
+        this.authService.updateLoginStatus(true);
+        this.router.navigateByUrl('/home');
+      })
+      .catch(error => {
+        console.error('Regisztrációs hiba:', error);
+        this.isLoading = false;
+        this.showForm = true;
+        
+        switch(error.code) {
+          case 'auth/email-already-in-use':
+            this.signupError = 'This email already in use.';
+            break;
+          case 'auth/invalid-email':
+            this.signupError = 'Invalid email.';
+            break;
+          case 'auth/weak-password':
+            this.signupError = 'The password is too weak. Use at least 6 characters.';
+            break;
+          default:
+            this.signupError = 'An error has occurred during registration. Please try again later.';
+        }
+      });
+  }
 }

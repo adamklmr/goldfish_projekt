@@ -1,9 +1,134 @@
 import { Injectable } from '@angular/core';
-
+import { Firestore, collection, doc, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy, getDoc, where } from '@angular/fire/firestore';
+import { Observable, from, switchMap, map, of, take, firstValueFrom } from 'rxjs';
+import { AuthService } from './auth.service';
+import { User } from '../models/User';
+import { Event } from '../models/Event';
 @Injectable({
   providedIn: 'root'
 })
 export class EventService {
+  private readonly EVENT_COLLECTION = 'events';
+  private readonly USER_COLLECTION = 'users';
 
-  constructor() { }
+
+  constructor(
+    private firestore: Firestore,
+    private authService: AuthService
+  ) { }
+
+  private formatDateToString(date: Date | string): string {
+    if (typeof date === 'string') {
+      const DateObj = new Date(date);
+      if (!isNaN(DateObj.getTime())) {
+        return new Date().toISOString().split('T')[0];
+      }
+      return date.includes('T') ? date.split('T')[0] : date;
+    }
+    if (date instanceof Date) {
+      return date.toISOString().split('T')[0];
+    }
+    return new Date().toISOString().split('T')[0];
+  }
+
+  //CREATE
+  async addEvent(event: Omit<Event, 'id'>): Promise<Event> {
+    try {
+      const user = await firstValueFrom(this.authService.currentUser.pipe(take(1)));
+      if (!user) {
+        throw new Error('No authenticated user found');
+      }
+
+      const eventsCollection = collection(this.firestore, this.EVENT_COLLECTION);
+      
+      const eventToSave = {
+        ...event,
+        startDate: this.formatDateToString(event.startDate as string),
+        endDate: this.formatDateToString(event.endDate as string)
+      };
+      
+      const docRef = await addDoc(eventsCollection, eventToSave);
+      const eventId = docRef.id;
+      
+      await updateDoc(docRef, { id: eventId });
+      
+      const newEvent = {
+        ...eventToSave,
+        id: eventId
+      } as Event;
+
+      // // Felhasználó tasks tömbjének frissítése
+      // const userDocRef = doc(this.firestore, this.USER_COLLECTION, user.uid);
+      // const userDoc = await getDoc(userDocRef);
+      // if (userDoc.exists()) {
+      //   const userData = userDoc.data() as User;
+      //   const events = userData.events || [];
+      //   events.push(eventId);
+      //   await updateDoc(userDocRef, { events });
+      // }
+
+      return newEvent;
+    } catch (error) {
+      console.error('Error adding event:', error);
+      throw error;
+    }
+  }
+  //READ
+  getAllEvents(): Observable<Event[]> {
+    return from(getDocs(collection(this.firestore, this.EVENT_COLLECTION))).pipe(
+      map(snapshot => {
+        return snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Event[];
+      })
+    );
+  }
+  getEventById(eventId: string): Observable<Event | null> {
+    const eventDocRef = doc(this.firestore, this.EVENT_COLLECTION, eventId);
+    return from(getDoc(eventDocRef)).pipe(
+      map(snapshot => {
+        if (snapshot.exists()) {
+          return { id: snapshot.id, ...snapshot.data() } as Event;
+        } else {
+          return null;
+        }
+      })
+    );
+  }
+  getEventsByUserId(userId: string): Observable<Event[]> {
+    const eventsCollection = collection(this.firestore, this.EVENT_COLLECTION);
+    const q = query(eventsCollection, where('userId', '==', userId), orderBy('startDate'));
+    return from(getDocs(q)).pipe(
+      map(snapshot => {
+        return snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Event[];
+      })
+    );
+  }
+   //UPDATE
+  async updateEvent(eventId: string, updatedEvent: Partial<Event>): Promise<void> {
+    try {
+      const eventDocRef = doc(this.firestore, this.EVENT_COLLECTION, eventId);
+      await updateDoc(eventDocRef, updatedEvent);
+    } catch (error) {
+      console.error('Error updating event:', error);
+      throw error;
+    }
+  }
+
+  //DELETE
+  async deleteEvent(eventId: string): Promise<void> {
+    try {
+      const eventDocRef = doc(this.firestore, this.EVENT_COLLECTION, eventId);
+      await deleteDoc(eventDocRef);
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      throw error;
+    }
+  }
+  
+
 }

@@ -9,8 +9,6 @@ export const environment = {
         storageBucket: "goldfish-6624c.firebasestorage.app",
         messagingSenderId: "168655505860",
         appId: "1:168655505860:web:6d595d537ccd82f4c97c91",
-        measurementId: "G-0P55G2SPQ8"
+        
     }
 };
-const app = initializeApp(environment.firebaseConfig);
-initializeAnalytics(app);

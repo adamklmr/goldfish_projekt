@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 // import { AdminGuard } from './shared/guards/admin.guard';
 import { authGuard,publicGuard } from './shared/guards/auth.guard';
+import { AdminGuard } from './shared/guards/admin.guard';
 
 export const routes: Routes = [
     {
@@ -11,7 +12,7 @@ export const routes: Routes = [
     {
         path: 'admin',
         loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent)
-        // canActivate: [AdminGuard],
+        ,canActivate: [AdminGuard]
     },
     {
         path: 'profile',

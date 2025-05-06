@@ -27,7 +27,7 @@
           @if (isLoggedIn) {
           <li class="profile-sidenav"><a routerLink="/profile">Profil</a></li>
           <li class="login-sidenav"><a mat-list-item (click)="logout()">Kijelentkezés</a></li>
-          }@if(!isLoggedIn) {
+          }@else{
           <li class="logout-sidenav"><a routerLink="/login">Bejelentkezés</a></li>
           }
         </ul>
@@ -62,12 +62,7 @@
 
               </div>
            </div>
-           @if (isLoggedIn) {
             <mat-icon id="cart-icon" routerLink="/cart">shopping_cart</mat-icon>
-           }
-           @else {
-            
-           }
             @if (isAdmin) {
               <mat-icon id="admin-icon" routerLink="/admin">shield</mat-icon>
             }

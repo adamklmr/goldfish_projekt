@@ -57,6 +57,7 @@ export class AppComponent implements OnInit,OnDestroy {
     this.authSubscription = this.authService.currentUser.subscribe(user => {
       this.isLoggedIn = !!user;
       localStorage.setItem('isLoggedIn', this.isLoggedIn ? 'true' : 'false');
+      this.isAdmin = user?.email == "admin@gmail.com" || false;
     });
   }
   ngOnDestroy(): void {
