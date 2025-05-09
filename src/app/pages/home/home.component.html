@@ -40,13 +40,13 @@
                         <mat-card-content>
                             <p>{{event.description}}</p>
                             <p><strong>Helyszín:</strong> {{event.location}}</p>
-                            <p><strong>Kezdés:</strong> {{event.startDate | date:'yyyy-MM-dd'}}</p>
-                            <p><strong>Vége:</strong> {{event.endDate | date:'yyyy-MM-dd'}}</p>
+                            <p><strong>Kezdés:</strong> {{event.startDate | datePipe}}</p>
+                            <p><strong>Vége:</strong> {{event.endDate | datePipe}}</p>
                           </mat-card-content>
                           <mat-card-actions>
-                            <!-- <button mat-flat-button
+                            <button mat-flat-button
                             [ngClass]="{ 'disabled-button': hasStarted(event.startDate) }" 
-                            [disabled]="hasStarted(event.startDate)">Érdekel</button> -->
+                            [disabled]="hasStarted(event.startDate)">Érdekel</button>
                           </mat-card-actions>
                 </mat-card>
             </div>
