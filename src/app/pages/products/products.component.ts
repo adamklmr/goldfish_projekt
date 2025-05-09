@@ -30,6 +30,8 @@ import { ProductService } from '../../shared/services/product.service';
 export class ProductsComponent implements OnInit{
   products: Product[] = [];
   isLoading = true;
+  filteredProducts: Product[] = [];
+  maxPrice: number | null = null;
 
   constructor(private productService: ProductService) {}
 
@@ -38,6 +40,7 @@ export class ProductsComponent implements OnInit{
       next: (data) => {
         this.products = data;
         this.isLoading = false;
+        this.filteredProducts = data;
       },
       error: (err) => {
         console.error('Error loading products:', err);
@@ -45,6 +48,14 @@ export class ProductsComponent implements OnInit{
       }
     });
   }
+  getFilteredProductsByPrice(): void {
+    this.filteredProducts = this.productService.getFilteredProductsByPrice(
+      this.products,
+      this.maxPrice || Infinity
+    );
+  }
+
+  
   // trackByIndex(index: number, item: any): number {
   //   return index;
   // }
@@ -91,6 +102,5 @@ export class ProductsComponent implements OnInit{
   //     this.filteredProducts = [...this.ProductObject];
   //   }
   // }
-
 }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit,Input,Output,EventEmitter,OnDestroy} from '@angular/core';
+import { Component, OnInit,ViewChild,OnDestroy} from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup,Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -21,6 +21,7 @@ import { Subscription } from 'rxjs';
 import { ProductService } from '../../shared/services/product.service';
 import { EventService } from '../../shared/services/event.service';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { MatTableDataSource } from '@angular/material/table';
 
 
 @Component({
@@ -51,13 +52,15 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 export class AdminComponent implements OnInit, OnDestroy {
   productForm!: FormGroup;
   eventForm!: FormGroup;
-  ProductsdisplayedColumns: string[] = ['instock', 'productName', 'productCategory', 'productPrice', 'productDescription'];
-  EventsdisplayedColumns: string[] = ['name', 'startDate', 'endDate', 'eventLocation', 'eventDescription'];
+  ProductsdisplayedColumns: string[] = ['instock', 'name', 'category', 'price', 'description'];
+  EventsdisplayedColumns: string[] = ['name', 'startDate', 'endDate', 'location', 'description'];
   products: Product[] = [];
   events: Event[] = [];
   form!: FormGroup;
   private subscriptions: Subscription[] = [];
-
+  @ViewChild(MatPaginator) paginator: MatPaginator | null = null;
+  productsDataSource = new MatTableDataSource(this.products);
+  eventsDataSource = new MatTableDataSource(this.events);
 
   constructor(private fb: FormBuilder,
               private productService: ProductService,
@@ -68,25 +71,28 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.productForm = this.fb.group({
-      productName: ['', Validators.required],
-      productCategory: ['', Validators.required],
-      productPrice: [0, [Validators.required, Validators.min(0)]],
-      productDescription: [''],
-      instock: [true]
+      name: ['', Validators.required],
+      category: ['', Validators.required],
+      price: [0, [Validators.required, Validators.min(0)]],
+      description: [''],
+      instock: [true],
+      pic: ['']
     });
     this.eventForm = this.fb.group({
       name: ['', Validators.required],
       startDate: ['', Validators.required],
       endDate: ['', Validators.required],
-      eventLocation: ['', Validators.required],
+      location: ['', Validators.required],
       pic: [''],
-      eventDescription: ['']
+      description: ['']
     });
     this.form = this.fb.group({
-
       listingItem: ['products'] // Default value can be 'products' or 'events'
-
     });
+    this.loadAllProducts();
+    this.loadAllEvents();
+
+
   }
   
   ngOnDestroy(): void {
@@ -115,21 +121,14 @@ export class AdminComponent implements OnInit, OnDestroy {
       const newEvent = this.eventForm.value;
 
       const startDate = this.eventForm.get('startDate')?.value;
-    const endDate = this.eventForm.get('endDate')?.value;
+      const endDate = this.eventForm.get('endDate')?.value;
 
       this.eventService.addEvent(newEvent).then(() => {
         this.loadAllEvents();
+        this.showNotification('Event added successfully', 'success');
         this.eventForm.reset();
       }).catch(error => {
         console.error('Error adding event:', error);
-      });
-      this.eventService.addEvent(newEvent).then(() => {
-        this.loadAllEvents();
-        this.showNotification('Event added successfully','success');
-        this.eventForm.reset();
-      }).catch(error => {
-        console.error('Error adding event:', error);
-        this.showNotification('Error adding event','error');
       });
     }
   }
@@ -150,15 +149,18 @@ export class AdminComponent implements OnInit, OnDestroy {
     const allProducts$ = this.productService.getAllProducts();
     const subscription = allProducts$.subscribe(products => {
       this.products = products;
+      console.log('Loaded products:', this.products);
     }, error => {
       console.error('Error loading products:', error);
     });
+    this.subscriptions.push(subscription);
   }
 
   loadAllEvents(): void {
     const allEvents$ = this.eventService.getAllEvents();
     const subscription = allEvents$.subscribe(events => {
       this.events = events;
+      console.log('Loaded events:', this.events);
     }, error => {
       console.error('Error loading events:', error);
     });

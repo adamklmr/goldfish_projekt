@@ -98,4 +98,11 @@ export class ProductService {
       throw error;
     }
   }
+  getFilteredProductsByPrice(products: Product[], maxPrice: number): Product[] {
+    if (maxPrice !== null && !isNaN(maxPrice)) {
+      return products.filter(product => product.price <= maxPrice);
+    } else {
+      return products;
+    }
+  }
 }

@@ -1,10 +1,11 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Component, OnInit, ChangeDetectorRef} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCard, MatCardModule,MatCardTitleGroup } from '@angular/material/card';
 import { DateFormatterPipe } from '../../shared/pipes/date.pipe';
 import { EventService } from '../../shared/services/event.service';
 import { Event } from '../../shared/models/Event';
+
 
 
 
@@ -16,6 +17,7 @@ import { Event } from '../../shared/models/Event';
     CommonModule,
     MatCardModule,
     MatButtonModule,
+    DateFormatterPipe
   ],
   templateUrl: './events.component.html',
   styleUrl: './events.component.scss'
@@ -38,7 +40,10 @@ export class EventsComponent implements OnInit {
       }
     });
   }
-
+  hasStarted(eventStartDate: string): boolean {
+    const now = new Date();
+    return new Date(eventStartDate) < now;
+  }
 reload(index: number): void {
     // Ellenőrizzük, hogy az index érvényes-e
     // if (index >= 0 && index < this.EventObject.length) {

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { MatCardModule, MatCardTitleGroup } from '@angular/material/card';
-import { Product, ProductObject } from '../../shared/models/Product';
+import { Product} from '../../shared/models/Product';
 import { MatButtonModule } from '@angular/material/button';
 import { CurrencyPipePipe } from '../../shared/pipes/currency.pipe.pipe';
 import { DateFormatterPipe } from '../../shared/pipes/date.pipe';
