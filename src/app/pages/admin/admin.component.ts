@@ -58,6 +58,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   form!: FormGroup;
   private subscriptions: Subscription[] = [];
 
+
   constructor(private fb: FormBuilder,
               private productService: ProductService,
               private eventService: EventService,
@@ -81,7 +82,11 @@ export class AdminComponent implements OnInit, OnDestroy {
       pic: [''],
       eventDescription: ['']
     });
-    
+    this.form = this.fb.group({
+
+      listingItem: ['products'] // Default value can be 'products' or 'events'
+
+    });
   }
   
   ngOnDestroy(): void {
@@ -142,19 +147,14 @@ export class AdminComponent implements OnInit, OnDestroy {
 
 
   loadAllProducts(): void {
-  
-    this.productService.getAllProducts().subscribe({
-      next: (products: Product[]) => {
-        this.products = products;
-        
-      },
-      error: (error: any) => {
-        console.error('Error loading products:', error);
-        
-        this.showNotification('Error loading products', 'error');
-      }
+    const allProducts$ = this.productService.getAllProducts();
+    const subscription = allProducts$.subscribe(products => {
+      this.products = products;
+    }, error => {
+      console.error('Error loading products:', error);
     });
   }
+
   loadAllEvents(): void {
     const allEvents$ = this.eventService.getAllEvents();
     const subscription = allEvents$.subscribe(events => {
