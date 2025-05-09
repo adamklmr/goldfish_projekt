@@ -1,4 +1,4 @@
-import { Component, OnInit, } from '@angular/core';
+import { Component, OnDestroy, OnInit, } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule, MatCardTitleGroup } from '@angular/material/card';
 import { Product, ProductObject } from '../../shared/models/Product';
@@ -9,6 +9,7 @@ import { MatOptionModule } from '@angular/material/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { ProductService } from '../../shared/services/product.service';
 
 @Component({
   selector: 'app-products',
@@ -26,34 +27,54 @@ import { MatInputModule } from '@angular/material/input';
   styleUrls: ['./products.component.scss']
 })
 
-export class ProductsComponent implements OnInit {
-  ProductObject = ProductObject; // ProA termékek tömbje
-  selectedIndex: number = 0; // Alapértelmezésben az első termék indexe
-  maxPrice: number = 0; // Alapértelmezett maximális ár
-  filteredProducts: Product[] = [...this.ProductObject];
-  categories: string[] = Array.from(new Set(this.ProductObject.map(product => product.category)));; // Kategóriák tömbje
+export class ProductsComponent implements OnInit{
+  products: Product[] = [];
+  isLoading = true;
+
+  constructor(private productService: ProductService) {}
 
   ngOnInit(): void {
+    this.productService.getAllProducts().subscribe({
+      next: (data) => {
+        this.products = data;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading products:', err);
+        this.isLoading = false;
+      }
+    });
+  }
+  // trackByIndex(index: number, item: any): number {
+  //   return index;
+  // }
+  // ProductObject = ProductObject; // ProA termékek tömbje
+  // selectedIndex: number = 0; // Alapértelmezésben az első termék indexe
+  // maxPrice: number = 0; // Alapértelmezett maximális ár
+  // filteredProducts: Product[] = [...this.ProductObject];
+  // categories: string[] = Array.from(new Set(this.ProductObject.map(product => product.category)));; // Kategóriák tömbje
 
-  }
-  reload(index: number): void {
-    // Ellenőrizzük, hogy az index érvényes-e
-    if (index >= 0 && index < this.ProductObject.length) {
-      this.selectedIndex = index; // Beállítjuk az új kiválasztott indexet
-      console.log("Új selectedIndex:", index); // Ellenőrzéshez
-    } else {
-      console.error("Érvénytelen index:", index);
-    }
-  }
-  getFilteredProducts(): void {
-    console.log('Max Price:', this.maxPrice);
-    console.log('All Products:', this.ProductObject);
-    if (this.maxPrice !== null && !isNaN(this.maxPrice)) {
-      this.filteredProducts = this.ProductObject.filter(product => product.price <= this.maxPrice);
-    } else {
-      this.filteredProducts = [...this.ProductObject];
-    }
-  }
+  // ngOnInit(): void {
+
+  // }
+  // reload(index: number): void {
+  //   // Ellenőrizzük, hogy az index érvényes-e
+  //   if (index >= 0 && index < this.ProductObject.length) {
+  //     this.selectedIndex = index; // Beállítjuk az új kiválasztott indexet
+  //     console.log("Új selectedIndex:", index); // Ellenőrzéshez
+  //   } else {
+  //     console.error("Érvénytelen index:", index);
+  //   }
+  // }
+  // getFilteredProducts(): void {
+  //   console.log('Max Price:', this.maxPrice);
+  //   console.log('All Products:', this.ProductObject);
+  //   if (this.maxPrice !== null && !isNaN(this.maxPrice)) {
+  //     this.filteredProducts = this.ProductObject.filter(product => product.price <= this.maxPrice);
+  //   } else {
+  //     this.filteredProducts = [...this.ProductObject];
+  //   }
+  // }
   // maxPrize(): void {
   //   console.log('Max Price:', this.maxPrice);
   //   if (this.maxPrice !== null && !isNaN(this.maxPrice)) {

@@ -42,19 +42,19 @@
       <form [formGroup]="eventForm" (ngSubmit)="addEvent()" class="event-form">
         <mat-form-field appearance="outline">
           <mat-label>Esemény neve</mat-label>
-          <input matInput type="text" formControlName="eventName" required />
+          <input matInput type="text" formControlName="name" required />
         </mat-form-field>
 
         <div class="time-container">
           <mat-form-field>
             <mat-label>Esemény kezdete (nap)</mat-label>
-            <input matInput [matDatepicker]="startDatepicker">
+            <input matInput [matDatepicker]="startDatepicker" formControlName="startDate">
             <mat-datepicker #startDatepicker></mat-datepicker>
             <mat-datepicker-toggle [for]="startDatepicker" matSuffix></mat-datepicker-toggle>
           </mat-form-field>
           <mat-form-field>
             <mat-label>Esemény vége (nap)</mat-label>
-            <input matInput [matDatepicker]="endDatepicker">
+            <input matInput [matDatepicker]="endDatepicker" formControlName="endDate">
             <mat-datepicker #endDatepicker></mat-datepicker>
             <mat-datepicker-toggle [for]="endDatepicker" matSuffix></mat-datepicker-toggle>
           </mat-form-field>
@@ -91,33 +91,25 @@
           <ng-container matColumnDef="instock">
             <th mat-header-cell *matHeaderCellDef>Készleten</th>
             <td mat-cell *matCellDef="let product">
-              <mat-checkbox 
-                [checked]="product.instock" 
-                (change)="toggleProductCompletion(product)"
-                color="primary">
-              </mat-checkbox>
+              <mat-checkbox [checked]="product.instock" color="primary"></mat-checkbox>
             </td>
           </ng-container>
-          <ng-container matColumnDef="name">
+          <ng-container matColumnDef="productName">
             <th mat-header-cell *matHeaderCellDef> Név </th>
             <td mat-cell *matCellDef="let product"> {{ product.name }} </td>
           </ng-container>
-
-          <ng-container matColumnDef="category">
+          <ng-container matColumnDef="productCategory">
             <th mat-header-cell *matHeaderCellDef> Kategória </th>
             <td mat-cell *matCellDef="let product"> {{ product.category }} </td>
           </ng-container>
-
-          <ng-container matColumnDef="price">
+          <ng-container matColumnDef="productPrice">
             <th mat-header-cell *matHeaderCellDef> Ár </th>
-              <td mat-cell *matCellDef="let product"> {{ product.price | currencyPipe}} </td>
+            <td mat-cell *matCellDef="let product"> {{ product.price | currencyPipe }} </td>
           </ng-container>
-
-          <ng-container matColumnDef="description">
+          <ng-container matColumnDef="productDescription">
             <th mat-header-cell *matHeaderCellDef> Leírás </th>
             <td mat-cell *matCellDef="let product"> {{ product.description }} </td>
           </ng-container>
-
           <tr mat-header-row *matHeaderRowDef="ProductsdisplayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: ProductsdisplayedColumns;"></tr>
         </table>
@@ -146,12 +138,12 @@
                 <td mat-cell *matCellDef="let event"> {{ event.endDate | datePipe }} </td>
               </ng-container>
 
-              <ng-container matColumnDef="location">
+              <ng-container matColumnDef="eventLocation">
                 <th mat-header-cell *matHeaderCellDef> Helyszín </th>
                 <td mat-cell *matCellDef="let event"> {{ event.location }} </td>
               </ng-container>
 
-              <ng-container matColumnDef="description">
+              <ng-container matColumnDef="eventDescription">
                 <th mat-header-cell *matHeaderCellDef> Leírás </th>
                 <td mat-cell *matCellDef="let event"> {{ event.description }} </td>
               </ng-container>

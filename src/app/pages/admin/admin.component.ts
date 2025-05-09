@@ -1,4 +1,4 @@
-import { Component, OnInit,Input,Output,EventEmitter} from '@angular/core';
+import { Component, OnInit,Input,Output,EventEmitter,OnDestroy} from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup,Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -17,6 +17,10 @@ import { MatButton, MatButtonModule } from '@angular/material/button';
 import { CurrencyPipePipe } from '../../shared/pipes/currency.pipe.pipe';
 import { DateFormatterPipe } from '../../shared/pipes/date.pipe';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
+import { Subscription } from 'rxjs';
+import { ProductService } from '../../shared/services/product.service';
+import { EventService } from '../../shared/services/event.service';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 
 
 @Component({
@@ -40,55 +44,156 @@ import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
     MatButtonModule,
     CurrencyPipePipe,
     DateFormatterPipe,
-    MatPaginatorModule
+    MatPaginatorModule, 
+    MatSnackBarModule,
   ]
 })
-export class AdminComponent implements OnInit {
-  @Input() products: Product[] = [];
-  @Input() events: Event[] = [];
-  @Output() productAdded = new EventEmitter<Product>();
-  @Output() eventAdded = new EventEmitter<Event>();
+export class AdminComponent implements OnInit, OnDestroy {
+  productForm!: FormGroup;
+  eventForm!: FormGroup;
+  ProductsdisplayedColumns: string[] = ['instock', 'productName', 'productCategory', 'productPrice', 'productDescription'];
+  EventsdisplayedColumns: string[] = ['name', 'startDate', 'endDate', 'eventLocation', 'eventDescription'];
+  products: Product[] = [];
+  events: Event[] = [];
+  form!: FormGroup;
+  private subscriptions: Subscription[] = [];
 
-  productForm: FormGroup;
-  eventForm: FormGroup;
-  selectedProduct: Product | null = null;
-  selectedEvent: Event | null = null;
+  constructor(private fb: FormBuilder,
+              private productService: ProductService,
+              private eventService: EventService,
+              private snackBar: MatSnackBar
 
-  constructor(private fb: FormBuilder) {
-    this.productForm = this.fb.group({
-      name: ['', Validators.required],
-      price: [0, [Validators.required, Validators.min(0)]],
-      description: [''],
-      imageUrl: [''],
-      category: ['']
-    });
-
-    this.eventForm = this.fb.group({
-      name: ['', Validators.required],
-      date: ['', Validators.required],
-      time: ['', Validators.required],
-      location: ['', Validators.required],
-      description: ['']
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
-    // Initialization logic here
+    this.productForm = this.fb.group({
+      productName: ['', Validators.required],
+      productCategory: ['', Validators.required],
+      productPrice: [0, [Validators.required, Validators.min(0)]],
+      productDescription: [''],
+      instock: [true]
+    });
+    this.eventForm = this.fb.group({
+      name: ['', Validators.required],
+      startDate: ['', Validators.required],
+      endDate: ['', Validators.required],
+      eventLocation: ['', Validators.required],
+      pic: [''],
+      eventDescription: ['']
+    });
+    
+  }
+  
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   addProduct(): void {
     if (this.productForm.valid) {
       const newProduct = this.productForm.value;
-      this.productAdded.emit(newProduct);
-      this.productForm.reset();
+
+      this.productService.addProduct(newProduct).then(() => {
+        this.loadAllProducts();
+        this.showNotification('Product added successfully', 'success');
+        this.productForm.reset();
+      }).catch(error => {
+        console.error('Error adding product:', error);
+        this.showNotification('Error adding product', 'error');
+      });
+    } else {
+      this.showNotification('Form is invalid. Please check your input.', 'error');
     }
   }
 
   addEvent(): void {
     if (this.eventForm.valid) {
       const newEvent = this.eventForm.value;
-      this.eventAdded.emit(newEvent);
-      this.eventForm.reset();
+
+      const startDate = this.eventForm.get('startDate')?.value;
+    const endDate = this.eventForm.get('endDate')?.value;
+
+      this.eventService.addEvent(newEvent).then(() => {
+        this.loadAllEvents();
+        this.eventForm.reset();
+      }).catch(error => {
+        console.error('Error adding event:', error);
+      });
+      this.eventService.addEvent(newEvent).then(() => {
+        this.loadAllEvents();
+        this.showNotification('Event added successfully','success');
+        this.eventForm.reset();
+      }).catch(error => {
+        console.error('Error adding event:', error);
+        this.showNotification('Error adding event','error');
+      });
     }
+  }
+
+  toggleProductCompletion(product: Product): void {
+    product.instock = !product.instock;
+    this.productService.updateProduct(product).then(() => {
+      this.loadAllProducts();
+      const message = product.instock ? 'Product marked as in stock' : 'Product marked as out of stock';
+      this.showNotification(message,'success');
+    }).catch(error => {
+      console.error('Error updating product:', error);
+    });
+  }
+
+
+  loadAllProducts(): void {
+  
+    this.productService.getAllProducts().subscribe({
+      next: (products: Product[]) => {
+        this.products = products;
+        
+      },
+      error: (error: any) => {
+        console.error('Error loading products:', error);
+        
+        this.showNotification('Error loading products', 'error');
+      }
+    });
+  }
+  loadAllEvents(): void {
+    const allEvents$ = this.eventService.getAllEvents();
+    const subscription = allEvents$.subscribe(events => {
+      this.events = events;
+    }, error => {
+      console.error('Error loading events:', error);
+    });
+  }
+
+  deleteProduct(productId: string): void {
+    if (confirm('Are you sure you want to delete this product?')) {
+      this.productService.deleteProduct(productId).then(() => {
+        this.loadAllProducts();
+        this.showNotification('Product deleted successfully','success');
+      }).catch(error => {
+        console.error('Error deleting product:', error);
+        this.showNotification('Error deleting product','error');
+      });
+    }
+  }
+
+
+  deleteEvent(eventId: string): void {
+    if (confirm('Are you sure you want to delete this event?')) {
+      this.eventService.deleteEvent(eventId).then(() => {
+        this.loadAllEvents();
+        this.showNotification('Event deleted successfully','success');
+      }).catch(error => {
+        console.error('Error deleting event:', error);
+        this.showNotification('Error deleting event','error');
+      });
+    }
+  }
+  private showNotification(message: string, type: 'success' | 'error' | 'warning'): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 3000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom',
+      panelClass: [`snackbar-${type}`]
+    });
   }
 }

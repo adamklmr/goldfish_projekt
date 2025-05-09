@@ -56,17 +56,6 @@ export class EventService {
         ...eventToSave,
         id: eventId
       } as Event;
-
-      // // Felhasználó tasks tömbjének frissítése
-      // const userDocRef = doc(this.firestore, this.USER_COLLECTION, user.uid);
-      // const userDoc = await getDoc(userDocRef);
-      // if (userDoc.exists()) {
-      //   const userData = userDoc.data() as User;
-      //   const events = userData.events || [];
-      //   events.push(eventId);
-      //   await updateDoc(userDocRef, { events });
-      // }
-
       return newEvent;
     } catch (error) {
       console.error('Error adding event:', error);
