@@ -8,6 +8,7 @@ import {
   UserCredential,
   createUserWithEmailAndPassword
 } from '@angular/fire/auth';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { 
   Firestore, 
   collection, 
@@ -27,7 +28,8 @@ export class AuthService {
   constructor(
     private auth: Auth,
     private firestore: Firestore,
-    private router: Router
+    private router: Router,
+    
   ) {
     this.currentUser = authState(this.auth);
   }
@@ -81,5 +83,9 @@ export class AuthService {
   }
   updateLoginStatus(isLoggedIn: boolean): void {
     localStorage.setItem('isLoggedIn', isLoggedIn ? 'true' : 'false');
+  }
+
+  getCurrentUserId(): string | null {
+  return this.auth.currentUser ? this.auth.currentUser.uid : null;
   }
 }

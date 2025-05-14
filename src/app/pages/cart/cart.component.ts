@@ -9,7 +9,9 @@ import { FormsModule } from '@angular/forms';
 import { MatInput, MatInputModule } from '@angular/material/input';
 import { CurrencyPipePipe } from '../../shared/pipes/currency.pipe.pipe';
 import { CouponObject } from '../../shared/models/Coupon';
-import { Cart, CartObject } from '../../shared/models/Cart';
+import { CartService } from '../../shared/services/cart.service';
+import { AuthService } from '../../shared/services/auth.service';
+
 
 @Component({
   selector: 'app-cart',
@@ -28,35 +30,71 @@ import { Cart, CartObject } from '../../shared/models/Cart';
   styleUrl: './cart.component.scss'
 })
 export class CartComponent {
-  ProductObject = CartObject; // A termékek tömbje
   ProductsdisplayedColumns = ['pic', 'name', 'category','quantity','price','actions']; // Az oszlopok, amiket meg akarunk jeleníteni a táblázatban
-
   couponCode: string = '';
   totalPrice: number = 0; // Példa alapár
   discount: number = 0;
   discountedPrice: number = 0;
-  products: Cart[] = CartObject;
+  cartItemsWithDetails: any[] = [];
+  currentUser: any = null;
 
-  ngOnInit(): void {
-    this.discountedPrice = this.getTotalPrice(); // Kezdetben a kedvezmény nélküli ár
+  constructor(private cartService: CartService,private authService: AuthService) {}
+  async ngOnInit(): Promise<void> {
+    this.loadCartItems();
     
-  }
-  removeFromCart(index: number): void {
-    // Ellenőrizzük, hogy az index érvényes-e
-    if (index >= 0 && index < this.products.length) {
-      this.ProductObject.splice(index,1); // Eltávolítjuk a terméket a tömbből 
-      this.products = [...this.ProductObject]; // Frissítjük a termékek tömbjét
-      console.log("Termék eltávolítva:", index); // Ellenőrzéshez
-      this.ngOnInit() // Frissítjük a teljes árat
-      this.getTotalPrice(); // Frissítjük a teljes árat
-      alert("Termék eltávolítva a kosárból");
-    } else {
-      console.error("Érvénytelen index:", index);
+    this.discountedPrice = this.getTotalPrice(); // Kezdetben a kedvezmény nélküli ár
+    try {
+      this.currentUser = await this.authService.getCurrentUserId(); // Fetch the current user
+      console.log('Current user:', this.currentUser);
+    } catch (error) {
+      console.error('Error fetching current user:', error);
     }
+  }
+  // async loadCurrentUser(): Promise<void> {
+  //   try {
+  //     this.currentUser = await this.authService.getCurrentUserId(); // Fetch the current user
+  //     console.log('Current user:', this.currentUser);
+  //   } catch (error) {
+  //     console.error('Error fetching current user:', error);
+  //   }
+  // }
+
+  async loadCartItems(): Promise<void> {
+
+  try {
+    this.cartItemsWithDetails = await this.cartService.fetchCartWithProductDetails();
+    console.log('Cart items with details:', this.cartItemsWithDetails);
+
+    // Ellenőrizd az összes szükséges mezőt
+    this.cartItemsWithDetails.forEach(item => {
+      if (!item.product_price || !item.product_name) {
+        console.warn('Missing data for item:', item);
+      }
+    });
+  } catch (error) {
+    console.error('Error loading cart items:', error);
+  }
+}
+
+  removeFromCart(productId: string): void {
+    // // Ellenőrizzük, hogy az index érvényes-e
+    // if (index >= 0 && index < this.products.length) {
+    //   this.ProductObject.splice(index,1); // Eltávolítjuk a terméket a tömbből 
+    //   this.products = [...this.ProductObject]; // Frissítjük a termékek tömbjét
+    //   console.log("Termék eltávolítva:", index); // Ellenőrzéshez
+    //   this.ngOnInit() // Frissítjük a teljes árat
+    //   this.getTotalPrice(); // Frissítjük a teljes árat
+    //   alert("Termék eltávolítva a kosárból");
+    // } else {
+    //   console.error("Érvénytelen index:", index);
+    // }
+    this.cartService.removeFromCart(productId,this.currentUser);
+    this.loadCartItems();
   }
 
   getTotalPrice(): number {
-      return this.products.reduce((total, product) => total + (product.price), 0);
+    this.totalPrice = 0; // Kezdjük 0-val
+    return this.totalPrice;
   }
 
   applyCoupon(): void {
@@ -75,21 +113,57 @@ export class CartComponent {
       this.discountedPrice = this.getTotalPrice();
     }
   }
-  checkout(): void {
-    if (this.products.length === 0) {
-          alert("A kosár üres, nem lehet fizetni.");
-          return;
-        }
-        alert(`Fizetendő összeg: ${this.discountedPrice} HUF`);
-        const totalPrice2 = this.getTotalPrice();
-
-        this.ProductObject = []; // Kiürítjük a kosarat
-        this.products = []; // Frissítjük a termékek tömbjét
-        this.discount = 0;
-        console.log(this.discountedPrice);
-        this.discountedPrice = 0;
-  }
- 
-
+  updateQuantity(productId: string, quantity: number): void {
+    if (quantity < 1 || quantity > 10) {
+      alert('Quantity must be between 1 and 10.');
+      return;
+    }
   
+    const cartItem = this.cartItemsWithDetails.find(item => item.product_id === productId);
+    if (!cartItem) {
+      console.error(`Cart item not found for product ID: ${productId}`);
+      return;
+    }
+  
+    // Log the existing item details
+    console.log('Before update:', cartItem);
+  
+    this.cartService.updateCartItem(cartItem.id,cartItem.quantity)
+      .then(() => {
+        console.log('Quantity updated successfully');
+        cartItem.quantity = quantity;
+  
+        // Ensure price is recalculated based on the updated quantity
+        // if (cartItem.product_price) {
+        //   cartItem.price = cartItem.product_price * cartItem.quantity;
+        // } else {
+        //   console.error('Product price is missing for item:', cartItem);
+        // }
+  
+        // Log the updated item
+        console.log('After update:', cartItem);
+      })
+      .catch(error => {
+        console.error('Error updating quantity:', error);
+      });
+  }
+  
+  
+  checkout(): void {
+    // if (this.products.length === 0) {
+
+    //       alert("A kosár üres, nem lehet fizetni.");
+    //       return;
+    //     }
+    //     alert(`Fizetendő összeg: ${this.discountedPrice} HUF`);
+    //     const totalPrice2 = this.getTotalPrice();
+
+    //     this.ProductObject = []; // Kiürítjük a kosarat
+    //     this.products = []; // Frissítjük a termékek tömbjét
+    //     this.discount = 0;
+    //     console.log(this.discountedPrice);
+    //     this.discountedPrice = 0;
+    this.cartService.checkout(this.currentUser);
+    alert('A kosár kiürítve!');
+  }  
 }

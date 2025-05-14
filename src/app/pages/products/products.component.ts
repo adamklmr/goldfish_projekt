@@ -10,6 +10,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ProductService } from '../../shared/services/product.service';
+import { CartService } from '../../shared/services/cart.service';
+import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
   selector: 'app-products',
@@ -32,10 +34,14 @@ export class ProductsComponent implements OnInit{
   isLoading = true;
   filteredProducts: Product[] = [];
   maxPrice: number | null = null;
+  currentUser: any = null;
 
-  constructor(private productService: ProductService) {}
+  constructor(
+    private productService: ProductService,
+    private cartService: CartService,
+    private authService: AuthService) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.productService.getAllProducts().subscribe({
       next: (data) => {
         this.products = data;
@@ -47,6 +53,12 @@ export class ProductsComponent implements OnInit{
         this.isLoading = false;
       }
     });
+    try {
+      this.currentUser = await this.authService.getCurrentUserId(); // Fetch the current user
+      console.log('Current user:', this.currentUser);
+    } catch (error) {
+      console.error('Error fetching current user:', error);
+    }
   }
   getFilteredProductsByPrice(): void {
     this.filteredProducts = this.productService.getFilteredProductsByPrice(
@@ -54,7 +66,15 @@ export class ProductsComponent implements OnInit{
       this.maxPrice || Infinity
     );
   }
-
+  addToCart(product: Product): void {
+    if (this.currentUser !== null) {
+      this.cartService.addToCart(product.id, this.currentUser);
+    } else {
+      console.error('User is not logged in.');
+      alert('Please log in to add items to the cart.');
+    }
+    alert(`${product.name} hozzáadva a kosárhoz!`);
+  }
   
   // trackByIndex(index: number, item: any): number {
   //   return index;
