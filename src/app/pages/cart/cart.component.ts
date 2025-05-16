@@ -177,6 +177,6 @@ export class CartComponent {
     //     console.log(this.discountedPrice);
     //     this.discountedPrice = 0;
     this.cartService.checkout(this.currentUser);
-    alert('A kosár kiürítve!');
+    alert('A termékek megrendelve!');
   }  
 }

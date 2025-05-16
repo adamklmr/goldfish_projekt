@@ -13,7 +13,9 @@ import {
   Firestore, 
   collection, 
   doc, 
-  setDoc 
+  setDoc,
+  updateDoc,
+  getDoc,
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
@@ -87,5 +89,42 @@ export class AuthService {
 
   getCurrentUserId(): string | null {
   return this.auth.currentUser ? this.auth.currentUser.uid : null;
+  }
+
+
+
+  async getUserData(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.auth.onAuthStateChanged(async (user) => {
+        if (user) {
+          const userDocRef = doc(this.firestore, 'Users', user.uid);
+          const userDocSnap = await getDoc(userDocRef);
+          if (userDocSnap.exists()) {
+            resolve(userDocSnap.data());
+          } else {
+            console.error("No such user document!");
+            resolve(null);
+          }
+        } else {
+          // Don't log error, just resolve null
+          resolve(null);
+        }
+      }, reject);
+    });
+  }
+  onAuthStateChanged(callback: (user: any) => void): void {
+    this.auth.onAuthStateChanged(callback);
+  }
+
+  async updateUserData(updatedData: Partial<User>): Promise<void> {
+    const user = this.auth.currentUser;
+    if(user) {
+      const userDocRef = doc(this.firestore, 'Users', user.uid);
+      await updateDoc(userDocRef, updatedData);
+      console.log("User data updated successfully");
+    } else {
+      console.error("No user is currently signed in.");
+      throw new Error("No user is currently signed in.");
+    }
   }
 }

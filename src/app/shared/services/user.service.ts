@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, doc, getDoc, collection, query, where, getDocs } from '@angular/fire/firestore';
+import { Firestore, doc, getDoc, collection, query, where, getDocs, updateDoc, deleteDoc } from '@angular/fire/firestore';
 import { AuthService } from './auth.service';
 import { Observable, from, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -16,6 +16,25 @@ export class UserService {
     private firestore: Firestore,
     private authService: AuthService
   ) { }
+  async getUserById(userId: string): Promise<any> {
+    if (!userId) {
+      throw new Error('Invalid userId: userId is required');
+    }
+  
+    const userDocRef = doc(this.firestore, `users/${userId}`); // Ensure userId is appended
+    const userSnap = await getDoc(userDocRef);
+  
+    if (userSnap.exists()) {
+      return userSnap.data();
+    } else {
+      return null; // User not found
+    }
+  }
+
+  async updateUser(userId: string, userData: any): Promise<void> {
+    const userDoc = doc(this.firestore, `users/${userId}`);
+    await updateDoc(userDoc, userData);
+  }
 
   getUserProfile(): Observable<{
     user: User | null,
@@ -92,5 +111,26 @@ export class UserService {
       }
     };
   }
+  async deleteUser(userId: string): Promise<void> {
+    try {
+      // Hivatkozás a felhasználó dokumentumára
+      const userDocRef = doc(this.firestore, `users/${userId}`);
+      
+      // Ellenőrizzük, hogy a dokumentum létezik-e
+      const userSnap = await getDoc(userDocRef);
+      if (!userSnap.exists()) {
+        throw new Error(`User with ID ${userId} does not exist.`);
+      }
+  
+      // Felhasználó törlése
+      await deleteDoc(userDocRef);
+      console.log(`User with ID ${userId} has been deleted.`);
+    } catch (error) {
+      console.error(`Error deleting user with ID ${userId}:`, error);
+      throw error;
+    }
+  }
+  
+  
 
 }

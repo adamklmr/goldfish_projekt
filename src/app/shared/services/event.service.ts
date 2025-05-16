@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, doc, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy, getDoc, where,QuerySnapshot } from '@angular/fire/firestore';
+import { Firestore, collection, doc, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy, getDoc, where,QuerySnapshot,arrayUnion,arrayRemove } from '@angular/fire/firestore';
 import { Observable, from, switchMap, map, of, take, firstValueFrom } from 'rxjs';
 import { AuthService } from './auth.service';
 import { User } from '../models/User';
@@ -134,6 +134,52 @@ export class EventService {
       )
     );
   }
+
+  async addInterest(userId: string, eventId: string): Promise<void> {
+    try {
+      const userRef = doc(this.firestore, this.USER_COLLECTION, userId);
+      const userDoc = await getDoc(userRef);
+  
+      if (!userDoc.exists()) {
+        throw new Error(`User with ID ${userId} does not exist.`);
+      }
+  
+      await updateDoc(userRef, {
+        events: arrayUnion(eventId)
+      });
+      console.log(`Interest added for user ${userId} and event ${eventId}`);
+    } catch (error) {
+      console.error(`Error adding interest:`, error);
+      throw error;
+    }
+  }
+
+async removeInterest(userId: string, eventId: string): Promise<void> {
+  try {
+    const userRef = doc(this.firestore, this.USER_COLLECTION, userId);
+    await updateDoc(userRef, {
+      events: arrayRemove(eventId)
+    });
+    console.log(`Interest removed for user ${userId} and event ${eventId}`);
+  } catch (error) {
+    console.error(`Error removing interest:`, error);
+    throw error;
+  }
+}
+
+async isInterested(userId: string, eventId: string): Promise<boolean> {
+  try {
+    const userRef = doc(this.firestore, this.USER_COLLECTION, userId);
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+    
+    return userData?.['events']?.includes(eventId) || false;
+  } catch (error) {
+    console.error(`Error checking interest:`, error);
+    return false;
+  }
+}
+
   
 
 }

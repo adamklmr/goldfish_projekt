@@ -3,7 +3,9 @@
     <mat-card>
       <mat-card-header>
         <mat-card-title>Saját profilom</mat-card-title>
-        <mat-icon>edit</mat-icon>
+        <button mat-icon-button [routerLink]="'/user-edit'" aria-label="Edit Profile">
+          <mat-icon>edit</mat-icon>
+        </button>
       </mat-card-header>
   
       <mat-card-content>
@@ -43,12 +45,17 @@
             <mat-card class="stat-card">
               <mat-card-header>
                 <mat-icon mat-card-avatar>done_all</mat-icon>
-                <mat-card-title>{{stats.events}}</mat-card-title>
+                <mat-card-title>{{user?.events?.length}}</mat-card-title>
                 <mat-card-subtitle>Események száma</mat-card-subtitle>
               </mat-card-header>
             </mat-card>
         </div>
       </div> 
+      <div class="delete-profile-section">
+        <button mat-button color="primary" (click)="onDeleteUser()">
+          Profil törlése
+        </button>
+      </div>
       </mat-card-content>
     </mat-card>
   </div>

@@ -1,0 +1,48 @@
+<div class="signup-page-container">
+    <div class="signup-container">
+        <h1>Profil szerkesztése</h1>
+        
+        <!-- @if (isLoading) {
+          <div class="loading-container">
+            <h2>Registration in progress</h2>
+            <mat-spinner diameter="50"></mat-spinner>
+            <p>Please wait...</p>
+          </div>
+        } -->
+      
+        
+        
+          <form [formGroup]="userForm"  class="signup-form">
+            <mat-form-field appearance="outline">
+                <mat-label>Email</mat-label>
+                <input matInput type="email" formControlName="email">
+                <mat-icon matSuffix>email</mat-icon>
+              </mat-form-field>
+    
+            <div class="name-row" formGroupName="name">
+              <mat-form-field appearance="outline">
+                <mat-label>Vezetéknév</mat-label>
+                <input matInput type="text" formControlName="lastname" />
+                <mat-icon matSuffix>person</mat-icon>
+              </mat-form-field>
+      
+              <mat-form-field appearance="outline">
+                <mat-label>Keresztnév</mat-label>
+                <input matInput type="text" formControlName="firstname" />
+                <mat-icon matSuffix>person</mat-icon>
+              </mat-form-field>
+            </div>
+      
+      
+            <div class="buttons-row">
+              <button mat-flat-button color="primary" type="submit"
+              (click)="saveUser()"
+            routerLink="/profile"
+              >Mentés</button>
+              <button mat-flat-button color="primary" type=""
+              >Jelszó megváltoztatása</button>
+            </div>
+          </form>
+        
+      </div>
+    </div>

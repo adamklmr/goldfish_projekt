@@ -1,7 +1,7 @@
 <div class="event-page-container">
   <h1>Az oldalon található összes esemény</h1>
 
-  <div class="filter-container">
+  <!-- <div class="filter-container">
     <label for="location-select">Helyszín:</label>
     <select id="location-select" [(ngModel)]="selectedLocation" (change)="filterEventsByLocation()">
       <option value="">Minden helyszín</option>
@@ -9,7 +9,7 @@
         {{ location }}
       </option>
     </select>
-  </div>
+  </div> -->
 
   <div class="events-container">
     <div *ngFor="let event of events; trackBy: trackByEventId" class="event-card">
@@ -27,7 +27,8 @@
         <mat-card-actions>
           <button mat-flat-button
             [ngClass]="{ 'disabled-button': hasStarted(event.startDate) }" 
-            [disabled]="hasStarted(event.startDate)">
+            [disabled]="hasStarted(event.startDate)"
+            (click)="toggleInterest(event.id)">
             Érdekel
           </button>
         </mat-card-actions>

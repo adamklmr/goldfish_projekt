@@ -10,7 +10,9 @@ import { Product } from '../../shared/models/Product';
 import { Subscription } from 'rxjs';
 import { Event } from '../../shared/models/Event';
 import { UserService } from '../../shared/services/user.service';
-
+import { RouterLink } from '@angular/router';
+import { MatButton } from '@angular/material/button';
+import { AuthService } from '../../shared/services/auth.service'; // Assuming you have an AuthService to get the current user ID
 
 @Component({
   selector: 'app-profile',
@@ -22,6 +24,8 @@ import { UserService } from '../../shared/services/user.service';
     MatSelectModule,
     MatFormFieldModule,
     MatProgressBarModule,
+    RouterLink,
+    MatButton
   
   ],
   templateUrl: './profile.component.html',
@@ -36,13 +40,23 @@ export class ProfileComponent implements OnInit,OnDestroy {
     events: 0,
   };
   isLoading = true;
+  currentUser: any = null;
   
   private subscription: Subscription | null = null;
 
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private authService: AuthService // Assuming you have an AuthService to get the current user ID
+  ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.loadUserProfile();
+    try {
+      this.currentUser = await this.authService.getCurrentUserId(); // Fetch the current user
+      console.log('Current user:', this.currentUser);
+    } catch (error) {
+      console.error('Error fetching current user:', error);
+    }
   }
 
   ngOnDestroy(): void {
@@ -75,5 +89,20 @@ export class ProfileComponent implements OnInit,OnDestroy {
     const lastInitial = this.user.name.lastname ? this.user.name.lastname.charAt(0).toUpperCase() : '';
     
     return firstInitial + (lastInitial ? lastInitial : '');
+  }
+  async onDeleteUser(): Promise<void> {
+    try {
+      const confirmation = window.confirm('Biztosan törölni szeretné a felhasználót?');
+      if (!confirmation) {
+        return;
+      }
+      await this.userService.deleteUser(this.currentUser);
+      console.log('Felhasználó sikeresen törölve.');
+      this.authService.signOut();
+      window.location.href = '/login';
+    } catch (error) {
+      console.log(this.currentUser)
+      console.error('Hiba a felhasználó törlése során:', error);
+    }
   }
 }

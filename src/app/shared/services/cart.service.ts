@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
-import { Firestore, collection, query, where, getDocs, doc, addDoc,setDoc, updateDoc, getDoc,deleteDoc } from '@angular/fire/firestore';
+import { Firestore, collection, query, where, getDocs, doc, updateDoc, deleteDoc,writeBatch } from '@angular/fire/firestore';
 import { Cart } from '../models/Cart';
 import { Product } from '../models/Product';
 import { deleteField, runTransaction } from 'firebase/firestore';
@@ -133,39 +133,37 @@ export class CartService {
   
 
   async checkout(userId: string): Promise<void> {
-    const userCartItems = this.cartItems.filter(item => item.user_id === userId);
-
-    if (userCartItems.length === 0) {
-      console.error('No items in the cart to checkout.');
-      return;
-    }
-
-    const orderCollection = collection(this.firestore, 'orders');
-    const batch = userCartItems.map(item => ({
-      product_id: item.product_id,
-      quantity: item.quantity
-    }));
-
     try {
-      // Create a new order in Firestore
-      // await addDoc(orderCollection, {
-      //   user_id: userId,
-      //   items: batch,
-      //   created_at: new Date()
-      // });
-
-      // Clear the user's cart
-      for (const item of userCartItems) {
-        const cartDocRef = doc(this.firestore, `cart/${item.id}`);
-        await updateDoc(cartDocRef, { quantity: 0 });
+      const cartCollection = collection(this.firestore, 'cart');
+      const q = query(cartCollection, where('user_id', '==', userId));
+      const cartSnapshot = await getDocs(q);
+  
+      if (cartSnapshot.empty) {
+        console.warn(`No cart items found for user_id ${userId}`);
+        return;
       }
-
-      this.cartItems = this.cartItems.filter(item => item.user_id !== userId);
-      this.cartSubject.next(this.cartItems);
+  
+      const batch = writeBatch(this.firestore);
+  
+      // Törli az összes kosár elemet a felhasználóhoz
+      cartSnapshot.docs.forEach(doc => batch.delete(doc.ref));
+  
+      // Batch végrehajtása
+      await batch.commit();
+      console.log(`All cart items for user_id ${userId} have been purchased.`);
+  
+      // Helyi cache frissítése, ha van ilyen
+      if (this.cartItems) {
+        this.cartItems = this.cartItems.filter(item => item.user_id !== userId);
+        this.cartSubject.next([...this.cartItems]);
+      }
+  
     } catch (error) {
-      console.error('Error during checkout:', error);
+      console.error(`Error during checkout for user_id ${userId}:`, error);
     }
   }
+  
+
 
   getCurrentUserCart(userId: string): Observable<Cart[]> {
     return this.getCartItems().pipe(

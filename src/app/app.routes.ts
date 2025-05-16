@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 // import { AdminGuard } from './shared/guards/admin.guard';
-import { authGuard,publicGuard } from './shared/guards/auth.guard';
+import { authGuard, publicGuard } from './shared/guards/auth.guard';
 import { AdminGuard } from './shared/guards/admin.guard';
 
 export const routes: Routes = [
@@ -44,7 +44,11 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/cart/cart.component').then(m => m.CartComponent)
              ,canActivate: [authGuard]
     },
-    
+    {
+        path: 'user-edit',
+        loadComponent: () => import('./pages/user-edit/user-edit.component').then(m => m.UserEditComponent)
+             ,canActivate: [authGuard]
+    },
     {
         path: '',
         redirectTo: 'home',
