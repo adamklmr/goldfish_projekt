@@ -66,6 +66,7 @@ export class ProductsComponent implements OnInit{
       this.maxPrice || Infinity
     );
   }
+  
   addToCart(product: Product): void {
     if (this.currentUser !== null) {
       this.cartService.addToCart(product.id, this.currentUser);

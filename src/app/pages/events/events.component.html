@@ -1,27 +1,37 @@
 <div class="event-page-container">
-<h1>Az oldalon található összes esemény   </h1>
-<div class="events-container">
-@for (event of events; track $index) {
-    <div class="event-card">
-        <mat-card>
-            <img mat-card-image [src]="event.pic" alt="{{event.name}}">
-            <mat-card-header>
-                <mat-card-title>{{event.name}}</mat-card-title>
-              </mat-card-header>
-                <mat-card-content>
-                    <p>{{event.description}}</p>
-                    <p><strong>Helyszín:</strong> {{event.location}}</p>
-                    <p><strong>Kezdés:</strong> {{event.startDate | datePipe}}</p>
-                    <p><strong>Vége:</strong> {{event.endDate |datePipe}}</p>
-                  </mat-card-content>
-                  <mat-card-actions>
-                    <button mat-flat-button
-                    [ngClass]="{ 'disabled-button': hasStarted(event.startDate) }" 
-                    [disabled]="hasStarted(event.startDate)">
-                      Érdekel</button>
-                  </mat-card-actions>
-        </mat-card>
+  <h1>Az oldalon található összes esemény</h1>
+
+  <div class="filter-container">
+    <label for="location-select">Helyszín:</label>
+    <select id="location-select" [(ngModel)]="selectedLocation" (change)="filterEventsByLocation()">
+      <option value="">Minden helyszín</option>
+      <option *ngFor="let location of locations" [value]="location">
+        {{ location }}
+      </option>
+    </select>
+  </div>
+
+  <div class="events-container">
+    <div *ngFor="let event of events; trackBy: trackByEventId" class="event-card">
+      <mat-card>
+        <img mat-card-image [src]="event.pic" alt="{{event.name}}">
+        <mat-card-header>
+          <mat-card-title>{{ event.name }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>{{ event.description }}</p>
+          <p><strong>Helyszín:</strong> {{ event.location }}</p>
+          <p><strong>Kezdés:</strong> {{ event.startDate | datePipe }}</p>
+          <p><strong>Vége:</strong> {{ event.endDate | datePipe }}</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-flat-button
+            [ngClass]="{ 'disabled-button': hasStarted(event.startDate) }" 
+            [disabled]="hasStarted(event.startDate)">
+            Érdekel
+          </button>
+        </mat-card-actions>
+      </mat-card>
     </div>
-}
-</div>
+  </div>
 </div>

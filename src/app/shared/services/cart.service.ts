@@ -41,29 +41,56 @@ export class CartService {
   //     };
   //   });
   // }
-  async fetchCartWithProductDetails(): Promise<any[]> {
+  async fetchCartWithProductDetails(userId: string): Promise<any[]> {
+    if (!userId) {
+      throw new Error('User ID is required.');
+    }
+
+    // Fetch cart items for the specific user
     const cartCollection = collection(this.firestore, 'cart');
-    const cartSnapshot = await getDocs(cartCollection);
+    const cartQuery = query(cartCollection, where('user_id', '==', userId));
+    const cartSnapshot = await getDocs(cartQuery);
     const cartItems = cartSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Cart[];
-  
-    // Collect product IDs from cart
+
+    if (cartItems.length === 0) {
+      console.warn('No cart items found for the user.');
+      return [];
+    }
+
+    // Collect product IDs from the user's cart
     const productIds = cartItems.map(item => item.product_id).filter(id => id !== undefined && id !== null);
-  
-    // Query only the necessary products
+
+    if (productIds.length === 0) {
+      console.warn('No product IDs found in the cart.');
+      return [];
+    }
+
+    // Query products in batches of 10 (Firestore's limit for 'in' queries)
     const productCollection = collection(this.firestore, 'products');
-    const q = query(productCollection, where('id', 'in', productIds));
-    const productSnapshot = await getDocs(q);
-    const products = productSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Product[];
-  
+    const products: Product[] = [];
+    const batchSize = 10;
+
+    for (let i = 0; i < productIds.length; i += batchSize) {
+      const batch = productIds.slice(i, i + batchSize);
+      const productQuery = query(productCollection, where('id', 'in', batch));
+      const productSnapshot = await getDocs(productQuery);
+      products.push(...productSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Product[]);
+    }
+
     // Join cart items with product details
     return cartItems.map(cartItem => {
       const product = products.find(p => p.id === cartItem.product_id);
+      if (!product) {
+        console.warn(`Product not found for cart item: ${cartItem.product_id}`);
+        return null;
+      }
       return {
         ...cartItem,
         ...product // Merge product details into the cart item
       };
-    });
+    }).filter(item => item !== null); // Remove null entries
   }
+  
   async addToCart(productId: string, userId: string, quantity: number = 1): Promise<void> {
     if (!userId || !productId) {
       throw new Error('Invalid userId or productId. Both must be defined.');

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, doc, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy, getDoc, where } from '@angular/fire/firestore';
+import { Firestore, collection, doc, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy, getDoc, where,QuerySnapshot } from '@angular/fire/firestore';
 import { Observable, from, switchMap, map, of, take, firstValueFrom } from 'rxjs';
 import { AuthService } from './auth.service';
 import { User } from '../models/User';
@@ -117,6 +117,22 @@ export class EventService {
       console.error('Error deleting event:', error);
       throw error;
     }
+  }
+
+  
+  getFilteredEvents(location: string): Observable<Event[]> {
+    const eventsCollection = collection(this.firestore, 'events');
+    const q = query(
+      eventsCollection,
+      where('startDate', '>=', new Date().toISOString()),
+      where('location', '==', location)
+    );
+
+    return from(
+      getDocs(q).then((querySnapshot: QuerySnapshot) =>
+        querySnapshot.docs.map(doc => doc.data() as Event)
+      )
+    );
   }
   
 

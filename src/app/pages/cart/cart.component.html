@@ -69,7 +69,7 @@
       </div> 
       <h2>Végösszeg:</h2>
       <p>
-        {{discountedPrice |  currencyPipe }}
+        {{ getTotalPrice() |  currencyPipe }}
       </p>
       <button mat-raised-button style="background-color: #58a7b3; color: white;" (click)="checkout()" class="checkout-button">Fizetés</button>
   </div>

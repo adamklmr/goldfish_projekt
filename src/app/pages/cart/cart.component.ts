@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, IterableDiffers, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule, MatCardTitleGroup } from '@angular/material/card';
 import { Product, ProductObject } from '../../shared/models/Product';
@@ -40,14 +40,19 @@ export class CartComponent {
 
   constructor(private cartService: CartService,private authService: AuthService) {}
   async ngOnInit(): Promise<void> {
-    this.loadCartItems();
-    
-    this.discountedPrice = this.getTotalPrice(); // Kezdetben a kedvezmény nélküli ár
     try {
-      this.currentUser = await this.authService.getCurrentUserId(); // Fetch the current user
+      // Fetch the current user ID
+      this.currentUser = await this.authService.getCurrentUserId();
       console.log('Current user:', this.currentUser);
+  
+      // Load cart items after the current user is set
+      await this.loadCartItems();
+  
+      // Calculate the total price
+      this.totalPrice = this.getTotalPrice();
+      this.discountedPrice = this.totalPrice; // Initially, discounted price is the same as total price
     } catch (error) {
-      console.error('Error fetching current user:', error);
+      console.error('Error during initialization:', error);
     }
   }
   // async loadCurrentUser(): Promise<void> {
@@ -60,21 +65,25 @@ export class CartComponent {
   // }
 
   async loadCartItems(): Promise<void> {
-
-  try {
-    this.cartItemsWithDetails = await this.cartService.fetchCartWithProductDetails();
-    console.log('Cart items with details:', this.cartItemsWithDetails);
-
-    // Ellenőrizd az összes szükséges mezőt
-    this.cartItemsWithDetails.forEach(item => {
-      if (!item.product_price || !item.product_name) {
-        console.warn('Missing data for item:', item);
-      }
-    });
-  } catch (error) {
-    console.error('Error loading cart items:', error);
+    if (!this.currentUser) {
+      console.error('Current user is not set. Cannot load cart items.');
+      return;
+    }
+  
+    try {
+      this.cartItemsWithDetails = await this.cartService.fetchCartWithProductDetails(this.currentUser);
+      console.log('Loaded cart items:', this.cartItemsWithDetails);
+  
+      // Check for missing data in cart items
+      this.cartItemsWithDetails.forEach(item => {
+        if (!item.product_price || !item.product_name) {
+          console.warn('Missing data for item:', item);
+        }
+      });
+    } catch (error) {
+      console.error('Error loading cart items:', error);
+    }
   }
-}
 
   removeFromCart(productId: string): void {
     // // Ellenőrizzük, hogy az index érvényes-e
@@ -93,8 +102,12 @@ export class CartComponent {
   }
 
   getTotalPrice(): number {
-    this.totalPrice = 0; // Kezdjük 0-val
-    return this.totalPrice;
+    this.totalPrice = 0; // Reset totalPrice to 0 before calculation
+    this.cartItemsWithDetails.forEach(item => {
+      if(item.user_id == this.currentUser)
+      this.totalPrice += item.price * item.quantity;
+    });
+    return this.totalPrice || 0;
   }
 
   applyCoupon(): void {
