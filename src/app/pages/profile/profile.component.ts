@@ -96,7 +96,9 @@ export class ProfileComponent implements OnInit,OnDestroy {
       if (!confirmation) {
         return;
       }
-      await this.userService.deleteUser(this.currentUser);
+
+      // await this.userService.deleteUser(this.currentUser);
+      await this.authService.deleteUser(this.currentUser);
       console.log('Felhasználó sikeresen törölve.');
       this.authService.signOut();
       window.location.href = '/login';

@@ -16,6 +16,7 @@ import {
   setDoc,
   updateDoc,
   getDoc,
+  deleteDoc
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
@@ -122,6 +123,27 @@ export class AuthService {
       const userDocRef = doc(this.firestore, 'Users', user.uid);
       await updateDoc(userDocRef, updatedData);
       console.log("User data updated successfully");
+    } else {
+      console.error("No user is currently signed in.");
+      throw new Error("No user is currently signed in.");
+    }
+  }
+  async deleteUser(userid:string): Promise<void> {
+    const user = this.auth.currentUser;
+    if (user) {
+      try {
+        const userDocRef = doc(this.firestore, `users/${userid}`);
+        await this.auth.currentUser?.delete();
+        const userSnap = await getDoc(userDocRef);
+        if (!userSnap.exists()) {
+          throw new Error(`User with ID ${userid} does not exist.`);
+        }
+        await deleteDoc(userDocRef);
+        console.log("User deleted successfully");
+      } catch (error) {
+        console.error("Error deleting user:", error);
+        throw error;
+      }
     } else {
       console.error("No user is currently signed in.");
       throw new Error("No user is currently signed in.");

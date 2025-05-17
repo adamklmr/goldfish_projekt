@@ -47,6 +47,7 @@ export class AppComponent implements OnInit,OnDestroy {
   isAdmin = false;
   private authSubscription?: Subscription;
   searchQuery: string = '';
+  currentUser: any = null;
 
   constructor(
     private authService: AuthService,
@@ -54,11 +55,21 @@ export class AppComponent implements OnInit,OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.loadLoggedInUser();
     this.authSubscription = this.authService.currentUser.subscribe(user => {
       this.isLoggedIn = !!user;
       localStorage.setItem('isLoggedIn', this.isLoggedIn ? 'true' : 'false');
       this.isAdmin = user?.email == "admin@gmail.com" || false;
     });
+  }
+
+  async loadLoggedInUser(): Promise<void> {
+    try {
+      this.currentUser = await this.authService.getCurrentUserId(); // Fetch the current user
+      console.log('Current user:', this.currentUser);
+    } catch (error) {
+      console.error('Error fetching current user:', error);
+    }
   }
   ngOnDestroy(): void {
     this.authSubscription?.unsubscribe();
