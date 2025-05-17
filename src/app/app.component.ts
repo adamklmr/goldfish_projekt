@@ -99,4 +99,10 @@ export class AppComponent implements OnInit,OnDestroy {
       this.router.navigate(['/search'], { queryParams: { q: this.searchQuery } });
     }
   }
+  kereses(query: string): void{
+    if(query.trim()){
+      this.router.navigate(["/search", query]);
+    }
+    
+  }
 }

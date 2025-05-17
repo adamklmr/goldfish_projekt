@@ -1,13 +1,33 @@
 <div class="results-container">
-    <div class="search-results">
-        <h2>Search Results</h2>
-        <div *ngIf="searchResults.length === 0" class="no-results">
-        <p>No results found for "{{ searchQuery }}"</p>
+    <h1 class="heading">Keresett <span> találatok</span></h1>
+        <div style="text-align: center;" *ngIf="results.length === 0">
+            <h1>Sajnos nincs találat!</h1>
         </div>
-        <div *ngFor="let result of searchResults" class="result-item">
-        <h3>{{ result.name }}</h3>
-        <p>{{ result.description }}</p>
-        <p>Price: {{ result.price | currency }}</p>
-        </div>
+      <div class="box-container" *ngIf="results.length > 0">
+        
+        @for (product of results; track $index) {
+            <div class="product-card">
+                <mat-card>
+                    <div class="product-image">
+                    <img mat-card-image [src]="product.pic" alt="{{product.name}}">
+                    </div>
+                    <div class="card-header">
+                    <mat-card-header>
+                        <mat-card-title>{{product.name}}</mat-card-title>
+                        <!-- <mat-card-subtitle>{{ProductObject[$index].category}}</mat-card-subtitle> -->
+                      </mat-card-header>
+                    </div>
+                    <div class="overlay">
+                        <mat-card-content>
+                            <p>{{product.description}}</p>
+                            <p><strong>Ár:</strong> {{product.price | currencyPipe}}</p>
+                          </mat-card-content>
+                          <!-- <mat-card-actions>
+                            <button mat-flat-button (click)="addToCart(product)">Kosárba</button>
+                          </mat-card-actions> -->
+                    </div>
+                </mat-card>
+              </div>
+        }
     </div>
 </div>

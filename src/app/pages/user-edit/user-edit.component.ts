@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { AuthService } from '../../shared/services/auth.service';
+import { MatSnackBarModule,MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-user-edit',
@@ -17,7 +18,8 @@ import { AuthService } from '../../shared/services/auth.service';
     ReactiveFormsModule,
     MatInputModule,
     MatButton,
-    MatIcon
+    MatIcon,
+    MatSnackBarModule
 
     
   ],
@@ -34,14 +36,14 @@ export class UserEditComponent implements OnInit {
   constructor(
     private fb: FormBuilder, 
     private userService: UserService,
-    private authService: AuthService // Assuming you have an AuthService to get the current user ID
+    private authService: AuthService,
+    private snackBar: MatSnackBar // Assuming you have an AuthService to get the current user ID
   ) {
     this.userForm = this.fb.group({
       name: this.fb.group({
         lastname: ['', Validators.required], // Nested under 'name'
         firstname: ['', Validators.required],
       }),
-      email: ['', [Validators.required, Validators.email]],
     });
   }
 
@@ -68,8 +70,15 @@ export class UserEditComponent implements OnInit {
   async saveUser(): Promise<void> {
     if (this.userForm.valid) {
       await this.userService.updateUser(this.userId, this.userForm.value);
-      alert('Felhasználói adatok frissítve!');
+      this.showNotification('Felhasználónév sikeresen módosítva!', 'success');
     }
-    
+  }
+  private showNotification(message: string, type: 'success' | 'error' | 'warning'): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 3000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom',
+      panelClass: [`snackbar-${type}`]
+    });
   }
 }
