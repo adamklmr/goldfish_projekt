@@ -66,7 +66,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   constructor(private fb: FormBuilder,
               private productService: ProductService,
               private eventService: EventService,
-              private snackBar: MatSnackBar
+              private snackBar: MatSnackBar,
 
   ) {}
 
@@ -199,5 +199,5 @@ export class AdminComponent implements OnInit, OnDestroy {
       verticalPosition: 'bottom',
       panelClass: [`snackbar-${type}`]
     });
-  }
+  }  
 }
