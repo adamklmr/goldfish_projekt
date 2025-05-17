@@ -13,6 +13,7 @@ import { ProductService } from '../../shared/services/product.service';
 import { CartService } from '../../shared/services/cart.service';
 import { CurrencyPipePipe } from '../../shared/pipes/currency.pipe.pipe';
 import { AuthService } from '../../shared/services/auth.service';
+import {MatRadioModule} from '@angular/material/radio';
 
 @Component({
   selector: 'app-products',
@@ -25,7 +26,8 @@ import { AuthService } from '../../shared/services/auth.service';
     MatFormFieldModule,
     MatOptionModule,
     MatInputModule,
-    CurrencyPipePipe
+    CurrencyPipePipe,
+    MatRadioModule,
   ],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.scss']
@@ -37,6 +39,7 @@ export class ProductsComponent implements OnInit{
   filteredProducts: Product[] = [];
   maxPrice: number | null = null;
   currentUser: any = null;
+  selectedCategory: string = 'all';
 
   constructor(
     private productService: ProductService,
@@ -62,34 +65,40 @@ export class ProductsComponent implements OnInit{
       console.error('Error fetching current user:', error);
     }
   }
+
+
  
   
   addToCart(product: Product): void {
     if (this.currentUser !== null) {
       this.cartService.addToCart(product.id, this.currentUser);
+      alert(`${product.name} hozzáadva a kosárhoz!`);
     } else {
       console.error('User is not logged in.');
       alert('Please log in to add items to the cart.');
     }
-    alert(`${product.name} hozzáadva a kosárhoz!`);
-  }
-  getFilteredProductsByPrice(): void {
-    this.filteredProducts = this.productService.getFilteredProductsByPrice(
-      this.products,
-      this.maxPrice || Infinity
-    );
-  }
-  filterByEquipment(): void {
-    this.productService.getEquipmentProducts().subscribe((products) => {
-      this.filteredProducts = products;
-    });
+    
   }
 
-  filterByCloths(): void {
-    this.productService.getClothsProducts().subscribe((products) => {
-      this.filteredProducts = products;
-    });
-    console.log('Cloths products:', this.filteredProducts);
+   filterProducts(): void {
+    if (this.selectedCategory === 'felszereles') {
+      this.productService.getEquipmentProducts().subscribe((products) => {
+        this.filteredProducts = this.filterByPrice(products);
+      });
+    } else if (this.selectedCategory === 'ruhazat') {
+      this.productService.getClothsProducts().subscribe((products) => {
+        this.filteredProducts = this.filterByPrice(products);
+      });
+    } else {
+      this.filteredProducts = this.filterByPrice(this.products);
+    }
+  }
+
+  filterByPrice(products: Product[]): Product[] {
+    if (this.maxPrice !== null) {
+      return products.filter(product => this.maxPrice !== null && product.price <= this.maxPrice);
+    }
+    return products;
   }
   
   // trackByIndex(index: number, item: any): number {

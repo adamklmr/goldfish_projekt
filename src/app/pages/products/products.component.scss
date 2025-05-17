@@ -7,31 +7,41 @@
     // width: 100vw;
 }
 .filter-container{
+    
+    justify-content: space-between;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     flex-wrap: wrap;
-    align-items: flex-start;
+    align-items: center;
     // border: 1px solid black;
     gap: 1em;
     width:fit-content;
     background-color: #58a7b3;
     border-radius: 10px;
-    padding: 20px 0px 20px 20px;
+    padding: 20px 20px 20px 20px;
+}
+.filtered{
+    display: flex;
+    align-items: center;
 }
 .filter-container input{
     width: 80%;
     height: 2rem;
     border-radius: 10px;
     border: none;
-    padding-left: 1em;
+    padding-left: 10px;
+    margin-left: 10px;
     background-color: white;
+    border: 1px solid black;
 }
 .filter-container button{
     &:hover{
         cursor: pointer;
         border: 1px solid #438797;
     }
+
 }
+
 .products-container {
     margin-top: 10px;
     width: fit-content;

@@ -1,22 +1,24 @@
 <div class="product-page-container">
 <h1>Az oldalon található öszes termék   </h1>
 <div class="filter-container">
-  <label for="maxPrice">Maximális ár (Ft):</label>
+  <div class="filtered">
+  <label for="maxPrice">Maximális ár:</label>
   <input matInput placeholder="Ide írd a maximális árat"
     type="number"
     id="maxPrice"
     min="0"
     [(ngModel)]="maxPrice">
-
-  <button mat-flat-button (click)="getFilteredProductsByPrice()">Szűrés</button>  
+  </div>
+   <div class="filtered">
   <label>
-    <input type="radio" name="productFilter" (change)="filterByEquipment()" />
-    Felszerelés
+    <mat-radio-group aria-label="Select an option" [(ngModel)]="selectedCategory" (change)="filterProducts()">
+      <mat-radio-button value="felszereles">Felszerelések</mat-radio-button>
+      <mat-radio-button value="ruhazat">Ruházat</mat-radio-button>
+      <mat-radio-button value="all">Összes termék</mat-radio-button>
+    </mat-radio-group>
   </label>
-  <label>
-    <input type="radio" name="productFilter" (change)="filterByCloths()" />
-    Ruházat
-  </label>
+  </div>  
+  <button mat-flat-button (click)="filterProducts()">Szűrés</button> 
 </div>
 <div class="products-container">
   @for (product of filteredProducts; track $index) {
