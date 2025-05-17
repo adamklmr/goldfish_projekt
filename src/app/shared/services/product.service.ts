@@ -47,8 +47,21 @@ export class ProductService {
   }
 
   //READ
-  getAllProducts(): Observable<Product[]> {
+  getAllProductsAdmin(): Observable<Product[]> {
     return from(getDocs(collection(this.firestore, this.PRODUCT_COLLECTION))).pipe(
+      map(snapshot => {
+        return snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Product[];
+      })
+    );
+  }
+
+  getAllProducts(): Observable<Product[]> {
+    const productsCollection = collection(this.firestore, this.PRODUCT_COLLECTION);
+    const q = query(productsCollection, where('instock', '==', true)); // Filter by inStock = true
+    return from(getDocs(q)).pipe(
       map(snapshot => {
         return snapshot.docs.map(doc => ({
           id: doc.id,
@@ -82,11 +95,22 @@ export class ProductService {
     );
   }
 
+
   //UPDATE
-  async updateProduct(product: Product): Promise<void> {
-    const productRef = doc(this.firestore, this.PRODUCT_COLLECTION, product.id);
-    await updateDoc(productRef, { ...product });
+  async updateProduct(productId: string, updatedData: Partial<Product>): Promise<void> {
+    try {
+      const productRef = doc(this.firestore, this.PRODUCT_COLLECTION, productId);
+      await updateDoc(productRef, updatedData);
+    } catch (error) {
+      console.error('Error updating product:', error);
+      throw error;
+    }
   }
+  toggleProductsInstock(productId: string, instock: boolean): Promise<void> {
+    return this.updateProduct(productId, { instock});
+  }
+
+
 
   //DELETE
   async deleteProduct(productId: string): Promise<void> {
@@ -98,6 +122,7 @@ export class ProductService {
       throw error;
     }
   }
+  
   getFilteredProductsByPrice(products: Product[], maxPrice: number): Product[] {
     if (maxPrice !== null && !isNaN(maxPrice)) {
       return products.filter(product => product.price <= maxPrice);

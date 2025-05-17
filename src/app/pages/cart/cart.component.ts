@@ -178,5 +178,6 @@ export class CartComponent {
     //     this.discountedPrice = 0;
     this.cartService.checkout(this.currentUser);
     alert('A termékek megrendelve!');
+    
   }  
 }

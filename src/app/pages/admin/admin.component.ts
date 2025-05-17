@@ -52,11 +52,12 @@ import { MatTableDataSource } from '@angular/material/table';
 export class AdminComponent implements OnInit, OnDestroy {
   productForm!: FormGroup;
   eventForm!: FormGroup;
-  ProductsdisplayedColumns: string[] = ['instock', 'name', 'category', 'price', 'description'];
+  ProductsdisplayedColumns: string[] = ['instock', 'name', 'category', 'price', 'description','action'];
   EventsdisplayedColumns: string[] = ['name', 'startDate', 'endDate', 'location', 'description'];
   products: Product[] = [];
   events: Event[] = [];
   form!: FormGroup;
+  
   private subscriptions: Subscription[] = [];
   @ViewChild(MatPaginator) paginator: MatPaginator | null = null;
   productsDataSource = new MatTableDataSource(this.products);
@@ -96,7 +97,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
   
   ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
   addProduct(): void {
@@ -135,8 +136,9 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   toggleProductCompletion(product: Product): void {
     product.instock = !product.instock;
-    this.productService.updateProduct(product).then(() => {
+    this.productService.toggleProductsInstock(product.id,product.instock).then(() => {
       this.loadAllProducts();
+      // console.log('Product updated:', product.instock);
       const message = product.instock ? 'Product marked as in stock' : 'Product marked as out of stock';
       this.showNotification(message,'success');
     }).catch(error => {
@@ -146,7 +148,7 @@ export class AdminComponent implements OnInit, OnDestroy {
 
 
   loadAllProducts(): void {
-    const allProducts$ = this.productService.getAllProducts();
+    const allProducts$ = this.productService.getAllProductsAdmin();
     const subscription = allProducts$.subscribe(products => {
       this.products = products;
       console.log('Loaded products:', this.products);
