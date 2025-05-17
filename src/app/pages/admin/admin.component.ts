@@ -53,7 +53,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   productForm!: FormGroup;
   eventForm!: FormGroup;
   ProductsdisplayedColumns: string[] = ['instock', 'name', 'category', 'price', 'description','action'];
-  EventsdisplayedColumns: string[] = ['name', 'startDate', 'endDate', 'location', 'description'];
+  EventsdisplayedColumns: string[] = ['name', 'startDate', 'endDate', 'location', 'description','action'];
   products: Product[] = [];
   events: Event[] = [];
   form!: FormGroup;

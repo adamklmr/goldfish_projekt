@@ -19,7 +19,7 @@
                             <p><strong>Ár:</strong> {{product.price | currencyPipe}}</p>
                           </mat-card-content>
                           <mat-card-actions>
-                            <button mat-flat-button>Kosárba</button>
+                            <button mat-flat-button (click)="addToCart(product)">Kosárba</button>
                           </mat-card-actions>
                     </div>
                 </mat-card>
@@ -46,7 +46,9 @@
                           <mat-card-actions>
                             <button mat-flat-button
                             [ngClass]="{ 'disabled-button': hasStarted(event.startDate) }" 
-                            [disabled]="hasStarted(event.startDate)">Érdekel</button>
+                            [disabled]="hasStarted(event.startDate)"
+                            (click)="toggleInterest(event.id)"
+                            >Érdekel</button>
                           </mat-card-actions>
                 </mat-card>
             </div>

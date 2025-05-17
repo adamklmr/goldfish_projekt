@@ -18,7 +18,7 @@ export class ProductService {
   ) { }
 
   //CREATE
-  async addProduct(product: Omit<Product, 'id'>): Promise<Product> {
+  async addProduct(product: Omit<Product, 'id' | 'pic'>): Promise<Product> {
     try {
       const user = await firstValueFrom(this.authService.currentUser.pipe(take(1)));
       if (!user) {
@@ -29,8 +29,10 @@ export class ProductService {
 
       const productToSave = {
         ...product,
+        instock: true,
+        pic: 'assets/images/products/test.png' // Default image path
       };
-      const docRef = await addDoc(productsCollection, product);
+      const docRef = await addDoc(productsCollection, productToSave);
       const productId = docRef.id;
 
       await updateDoc(docRef, { id: productId });
@@ -60,7 +62,13 @@ export class ProductService {
 
   getAllProducts(): Observable<Product[]> {
     const productsCollection = collection(this.firestore, this.PRODUCT_COLLECTION);
-    const q = query(productsCollection, where('instock', '==', true)); // Filter by inStock = true
+    // Filter by inStock = true and order by price ascending
+    const q = query(
+      productsCollection,
+      where('instock', '==', true),
+      orderBy('price', 'asc'),
+      orderBy('name', 'asc') // Secondary sort by name alphabetically
+    );
     return from(getDocs(q)).pipe(
       map(snapshot => {
         return snapshot.docs.map(doc => ({
@@ -84,7 +92,7 @@ export class ProductService {
   }
   getProductsByUserId(userId: string): Observable<Product[]> {
     const productsCollection = collection(this.firestore, this.PRODUCT_COLLECTION);
-    const q = query(productsCollection, where('userId', '==', userId), orderBy('createdAt'));
+    const q = query(productsCollection, where('userId', '==', userId));
     return from(getDocs(q)).pipe(
       map((snapshot) => {
         return snapshot.docs.map(doc => ({
@@ -122,12 +130,46 @@ export class ProductService {
       throw error;
     }
   }
-  
+
   getFilteredProductsByPrice(products: Product[], maxPrice: number): Product[] {
     if (maxPrice !== null && !isNaN(maxPrice)) {
       return products.filter(product => product.price <= maxPrice);
     } else {
       return products;
     }
+  }
+  getEquipmentProducts(): Observable<Product[]> {
+    const productsCollection = collection(this.firestore, this.PRODUCT_COLLECTION);
+    const q = query(
+      productsCollection,
+      where('instock', '==', true),
+      where('category', '==', 'Felszerelés'),
+      orderBy('price', 'asc')
+    );
+    return from(getDocs(q)).pipe(
+      map(snapshot => {
+        return snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Product[];
+      })
+    );
+  }
+  getClothsProducts(): Observable<Product[]> {
+    const productsCollection = collection(this.firestore, this.PRODUCT_COLLECTION);
+    const q = query(
+      productsCollection,
+      where('instock', '==', true),
+      where('category', '==', 'Ruházat'),
+      orderBy('price', 'asc')
+    );
+    return from(getDocs(q)).pipe(
+      map(snapshot => {
+        return snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Product[];
+      })
+    );
   }
 }

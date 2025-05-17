@@ -9,7 +9,14 @@
     [(ngModel)]="maxPrice">
 
   <button mat-flat-button (click)="getFilteredProductsByPrice()">Szűrés</button>  
-
+  <label>
+    <input type="radio" name="productFilter" (change)="filterByEquipment()" />
+    Felszerelés
+  </label>
+  <label>
+    <input type="radio" name="productFilter" (change)="filterByCloths()" />
+    Ruházat
+  </label>
 </div>
 <div class="products-container">
   @for (product of filteredProducts; track $index) {
@@ -27,7 +34,7 @@
               <div class="overlay">
                   <mat-card-content>
                       <p>{{product.description}}</p>
-                      <p><strong>Ár:</strong> {{product.price}} Ft</p>
+                      <p><strong>Ár:</strong> {{product.price | currencyPipe}}</p>
                     </mat-card-content>
                     <mat-card-actions>
                       <button mat-flat-button (click)="addToCart(product)">Kosárba</button>

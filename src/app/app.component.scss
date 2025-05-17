@@ -18,7 +18,7 @@ ul{
         cursor: pointer;
     }
     position: absolute;
-    left: 10px;
+    left: 0px;
 }
 .logo-container img {
     height: 100px;
@@ -150,8 +150,8 @@ mat-toolbar{
         display: flex;
     }
     .logo-container {
-        position: absolute;
-        left: 70px;
+        position: relative;        
+
     }
 }
 @media (min-width: 905px) {
@@ -179,11 +179,14 @@ mat-toolbar{
     #search-icon{
         display: none;
     }
-    
+    .menu-toggle-button{
+        position: absolute;
+        left: 5px;
+    }
 }
 @media (max-width: 600px) {
-    .logo-container img {
-        height: 56px;
+    .logo-container{
+       display: none;
     }
 }
 

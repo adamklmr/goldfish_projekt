@@ -112,7 +112,7 @@
             <td mat-cell *matCellDef="let product"> {{ product.description }} </td>
           </ng-container>
           <ng-container matColumnDef="action">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <th mat-header-cell *matHeaderCellDef>Törlés</th>
             <td mat-cell *matCellDef="let product">
               <button mat-icon-button color="warn" (click)="deleteProduct(product.id)" aria-label="Delete product">
                 <mat-icon>delete</mat-icon>
@@ -155,6 +155,14 @@
               <ng-container matColumnDef="description">
                 <th mat-header-cell *matHeaderCellDef> Leírás </th>
                 <td mat-cell *matCellDef="let event"> {{ event.description }} </td>
+              </ng-container>
+              <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef>Törlés</th>
+                <td mat-cell *matCellDef="let event">
+                  <button mat-icon-button color="warn" (click)="deleteEvent(event.id)" aria-label="Delete product">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
               </ng-container>
 
               <tr mat-header-row *matHeaderRowDef="EventsdisplayedColumns"></tr>

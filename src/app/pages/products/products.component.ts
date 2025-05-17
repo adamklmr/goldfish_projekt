@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 import { MatCardModule, MatCardTitleGroup } from '@angular/material/card';
 import { Product, ProductObject } from '../../shared/models/Product';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,6 +11,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ProductService } from '../../shared/services/product.service';
 import { CartService } from '../../shared/services/cart.service';
+import { CurrencyPipePipe } from '../../shared/pipes/currency.pipe.pipe';
 import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
@@ -23,7 +24,8 @@ import { AuthService } from '../../shared/services/auth.service';
     FormsModule,
     MatFormFieldModule,
     MatOptionModule,
-    MatInputModule
+    MatInputModule,
+    CurrencyPipePipe
   ],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.scss']
@@ -60,12 +62,7 @@ export class ProductsComponent implements OnInit{
       console.error('Error fetching current user:', error);
     }
   }
-  getFilteredProductsByPrice(): void {
-    this.filteredProducts = this.productService.getFilteredProductsByPrice(
-      this.products,
-      this.maxPrice || Infinity
-    );
-  }
+ 
   
   addToCart(product: Product): void {
     if (this.currentUser !== null) {
@@ -75,6 +72,24 @@ export class ProductsComponent implements OnInit{
       alert('Please log in to add items to the cart.');
     }
     alert(`${product.name} hozzáadva a kosárhoz!`);
+  }
+  getFilteredProductsByPrice(): void {
+    this.filteredProducts = this.productService.getFilteredProductsByPrice(
+      this.products,
+      this.maxPrice || Infinity
+    );
+  }
+  filterByEquipment(): void {
+    this.productService.getEquipmentProducts().subscribe((products) => {
+      this.filteredProducts = products;
+    });
+  }
+
+  filterByCloths(): void {
+    this.productService.getClothsProducts().subscribe((products) => {
+      this.filteredProducts = products;
+    });
+    console.log('Cloths products:', this.filteredProducts);
   }
   
   // trackByIndex(index: number, item: any): number {
