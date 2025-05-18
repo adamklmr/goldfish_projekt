@@ -73,6 +73,7 @@ export class MenuComponent implements OnInit, AfterViewInit {
 
   logout() {
     localStorage.setItem('isLoggedIn', 'false');
+    this.authService.signOut();
     window.location.href = '/home';
     this.closeMenu();
   }
