@@ -16,12 +16,13 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButton, MatButtonModule } from '@angular/material/button';
 import { CurrencyPipePipe } from '../../shared/pipes/currency.pipe.pipe';
 import { DateFormatterPipe } from '../../shared/pipes/date.pipe';
-import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
+import {MatPaginator, MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import { Subscription } from 'rxjs';
 import { ProductService } from '../../shared/services/product.service';
 import { EventService } from '../../shared/services/event.service';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
+import { AuthService } from '../../shared/services/auth.service';
 
 
 @Component({
@@ -47,16 +48,24 @@ import { MatTableDataSource } from '@angular/material/table';
     DateFormatterPipe,
     MatPaginatorModule, 
     MatSnackBarModule,
+    
   ]
 })
 export class AdminComponent implements OnInit, OnDestroy {
   productForm!: FormGroup;
   eventForm!: FormGroup;
-  ProductsdisplayedColumns: string[] = ['instock', 'name', 'category', 'price', 'description','action'];
-  EventsdisplayedColumns: string[] = ['name', 'startDate', 'endDate', 'location', 'description','action'];
+  ProductsdisplayedColumns: string[] = ['pic','instock', 'name', 'category', 'price', 'description','action'];
+  EventsdisplayedColumns: string[] = ['pic','name', 'startDate', 'endDate', 'location', 'description','action'];
   products: Product[] = [];
   events: Event[] = [];
   form!: FormGroup;
+  pageSize: number = 5;
+  pageIndex: number = 0;
+  pageIndexEvents: number = 0;
+  pageSizeOptions: number[] = [5, 10, 20];
+  pagedProducts: any[] = [];
+  pagedEvents: any[] = [];
+  currentUser: any = null;
   
   private subscriptions: Subscription[] = [];
   @ViewChild(MatPaginator) paginator: MatPaginator | null = null;
@@ -67,6 +76,7 @@ export class AdminComponent implements OnInit, OnDestroy {
               private productService: ProductService,
               private eventService: EventService,
               private snackBar: MatSnackBar,
+              private authService: AuthService,
 
   ) {}
 
@@ -92,10 +102,19 @@ export class AdminComponent implements OnInit, OnDestroy {
     });
     this.loadAllProducts();
     this.loadAllEvents();
+    this.loadUserData();
 
 
   }
-  
+  async loadUserData(): Promise<void> {
+    try {
+      this.currentUser = await this.authService.getCurrentUser();
+      console.log('Current user:', this.currentUser);
+      
+    } catch (error) {
+      console.error('Error fetching current user:', error);
+    }
+  }
   ngOnDestroy(): void {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
@@ -200,4 +219,24 @@ export class AdminComponent implements OnInit, OnDestroy {
       panelClass: [`snackbar-${type}`]
     });
   }  
+  updatePagedProducts(){
+    const start = this.pageIndex * this.pageSize;
+    const end = start + this.pageSize;
+    this.pagedProducts = this.products.slice(start, end);
+  }
+  onPageChange(event: PageEvent) {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.updatePagedProducts();
+  }
+  // updatePagedEvents(){
+  //   const start = this.pageIndexEvents * this.pageSize;
+  //   const end = start + this.pageSize;
+  //   this.pagedEvents = this.events.slice(start, end);
+  // }
+  // onPageChangeEvents(event: PageEvent) {
+  //   this.pageIndex = event.pageIndexEvents;
+  //   this.pageSize = event.pageSize;
+  //   this.updatePagedEvents();
+  // }
 }
