@@ -1,11 +1,6 @@
 Admin bejelentkezés
     email: admin@gmail.com
-    jelszó: admin
+    jelszó: admin123
 Felhasználó bejelentkezés
-    email: test@gmail.com
-    jelszó: teszt123
-TODO - 2. mérföldkőre:
-    - Kép feltöltése admin oldalon
-    - Kosárban a termékek mennyiségének a beállítása
-    - Keresés megvalósítása az oldalon
-    - Footer kibővítése
+    email: magyarpeter@gmail.com
+    jelszó: peter123
