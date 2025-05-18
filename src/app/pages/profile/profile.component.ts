@@ -91,6 +91,10 @@ export class ProfileComponent implements OnInit,OnDestroy {
     return firstInitial + (lastInitial ? lastInitial : '');
   }
   async onDeleteUser(): Promise<void> {
+    if (this.user?.email === 'admin@gmail.com') {
+      alert('Az adminisztrátor profilja nem törölhető.');
+      return;
+    }
     try {
       const confirmation = window.confirm('Biztosan törölni szeretné a felhasználót?');
       if (!confirmation) {
@@ -106,5 +110,8 @@ export class ProfileComponent implements OnInit,OnDestroy {
       console.log(this.currentUser)
       console.error('Hiba a felhasználó törlése során:', error);
     }
+  }
+  logout(): void {
+    this.authService.signOut();
   }
 }

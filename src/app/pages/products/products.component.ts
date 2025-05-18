@@ -58,7 +58,7 @@ export class ProductsComponent implements OnInit{
     try {
       this.currentUser = await this.authService.getCurrentUser();
       console.log('Current user:', this.currentUser);
-      console.log('User events:', this.currentUser.events);
+      
     } catch (error) {
       console.error('Error fetching current user:', error);
     }

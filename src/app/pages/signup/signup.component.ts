@@ -32,8 +32,8 @@ export class SignupComponent {
     password: new FormControl('', [Validators.required, Validators.minLength(6)]),
     rePassword: new FormControl('', [Validators.required]),
     name: new FormGroup({
-      firstname: new FormControl('', [Validators.required, Validators.minLength(2)]),
-      lastname: new FormControl('', [Validators.required, Validators.minLength(2)])
+      lastname: new FormControl('', [Validators.required, Validators.minLength(2)]),
+      firstname: new FormControl('', [Validators.required, Validators.minLength(2)])
     })
   });
 

@@ -83,11 +83,12 @@ export class HomeComponent implements OnInit {
   addToCart(product: Product): void {
     if (this.currentUser !== null) {
       this.cartService.addToCart(product.id, this.currentUser.id);
+    this.showNotification('A terméket hozzáadtad a kosárhoz!', 'success');
+
     } else {
       console.error('User is not logged in.');
       alert('Please log in to add items to the cart.');
     }
-    this.showNotification('A terméket hozzáadtad a kosárhoz!', 'success');
   }
 
   toggleInterest(eventId: string): void {

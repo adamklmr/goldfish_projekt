@@ -3,7 +3,7 @@
     <mat-card>
       <mat-card-header>
         <mat-card-title>Saját profilom</mat-card-title>
-        <button mat-icon-button [routerLink]="'/user-edit'" aria-label="Edit Profile">
+        <button mat-icon-button [routerLink]="'/user-edit'" aria-label="Edit Profile" class="edit-button">
           <mat-icon>edit</mat-icon>
         </button>
       </mat-card-header>
@@ -21,7 +21,7 @@
               </div>
             </div>
             <div class="user-details">
-              <h3 class="user-name">{{ user.name.firstname }} {{ user.name.lastname }}</h3>
+              <h3 class="user-name">{{ user.name.lastname }} {{ user.name.firstname }}</h3>
               <div class="user-email">
                 <mat-icon>email</mat-icon>
                 <span>{{ user.email }}</span>
@@ -46,14 +46,17 @@
               <mat-card-header>
                 <mat-icon mat-card-avatar>done_all</mat-icon>
                 <mat-card-title>{{user?.events?.length}}</mat-card-title>
-                <mat-card-subtitle>Események száma</mat-card-subtitle>
+                <mat-card-subtitle>Eseményeim száma</mat-card-subtitle>
               </mat-card-header>
             </mat-card>
         </div>
       </div> 
-      <div class="delete-profile-section">
-        <button mat-raised-button style="background-color: #58a7b3; color: white;" (click)="onDeleteUser()">
+      <div class="button-section">
+        <button mat-flat-button color="primary" (click)="onDeleteUser()">
           Profil törlése
+        </button>
+        <button mat-flat-button color="primary" type="submit" (click)="logout()">
+          Kijelentkezés
         </button>
       </div>
       </mat-card-content>

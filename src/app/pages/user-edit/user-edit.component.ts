@@ -8,6 +8,7 @@ import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { AuthService } from '../../shared/services/auth.service';
 import { MatSnackBarModule,MatSnackBar } from '@angular/material/snack-bar';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-user-edit',
@@ -19,7 +20,8 @@ import { MatSnackBarModule,MatSnackBar } from '@angular/material/snack-bar';
     MatInputModule,
     MatButton,
     MatIcon,
-    MatSnackBarModule
+    MatSnackBarModule,
+    RouterLink
 
     
   ],

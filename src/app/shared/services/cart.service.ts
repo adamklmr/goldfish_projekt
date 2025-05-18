@@ -127,7 +127,7 @@ export class CartService {
       }
     });
   
-    console.log('Item successfully added to cart.');
+    
   }
   
   
