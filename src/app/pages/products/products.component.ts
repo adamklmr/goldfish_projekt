@@ -102,7 +102,12 @@ export class ProductsComponent implements OnInit{
       this.productService.getClothsProducts().subscribe((products) => {
         this.filteredProducts = this.filterByPrice(products);
       });
-    } else {
+    } else if (this.selectedCategory === 'all') {
+      this.productService.getEveryProducts().subscribe((products) => {
+        this.filteredProducts = this.filterByPrice(products);
+      });
+    } 
+    else {
       this.filteredProducts = this.filterByPrice(this.products);
     }
   }

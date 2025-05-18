@@ -172,4 +172,21 @@ export class ProductService {
       })
     );
   }
+  getEveryProducts(): Observable<Product[]> {
+    const productsCollection = collection(this.firestore, this.PRODUCT_COLLECTION);
+    const q = query(
+      productsCollection,
+      where('instock', '==', true),
+      where('category', 'in', ['Ruházat', 'Felszerelés']),
+      orderBy('price', 'asc')
+    );
+    return from(getDocs(q)).pipe(
+      map(snapshot => {
+        return snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Product[];
+      })
+    );
+  }
 }

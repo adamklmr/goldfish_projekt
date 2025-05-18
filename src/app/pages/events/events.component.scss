@@ -32,7 +32,9 @@
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
 }
-  
+mat-card{
+    min-height: 560px;
+}
 
 @media (max-width: 768px) {
     .event-card {
@@ -50,4 +52,4 @@
     background-color: #ccc;
     color: #666;
     cursor: not-allowed;
-  }
+}

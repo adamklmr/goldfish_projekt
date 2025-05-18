@@ -89,7 +89,7 @@ export class EventService {
 
   getEventsByUserId(userId: string): Observable<Event[]> {
     const eventsCollection = collection(this.firestore, this.EVENT_COLLECTION);
-    const q = query(eventsCollection, where('userId', '==', userId), orderBy('startDate'));
+    const q = query(eventsCollection, where('userid', '==', userId), orderBy('startDate'));
     return from(getDocs(q)).pipe(
       map(snapshot => {
         return snapshot.docs.map(doc => ({
