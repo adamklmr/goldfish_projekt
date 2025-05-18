@@ -1,5 +1,5 @@
 import { Component, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
-import { RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MenuComponent } from './shared/menu/menu.component';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule } from '@angular/material/button';
@@ -52,6 +52,7 @@ export class AppComponent implements OnInit,OnDestroy {
   constructor(
     private authService: AuthService,
     private router: Router,   
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -60,6 +61,11 @@ export class AppComponent implements OnInit,OnDestroy {
       this.isLoggedIn = !!user;
       localStorage.setItem('isLoggedIn', this.isLoggedIn ? 'true' : 'false');
       this.isAdmin = user?.email == "admin@gmail.com" || false;
+    });
+
+    this.route.queryParams.subscribe(params => {
+      this.searchQuery = params['q'] || '';
+      this.performSearch(this.searchQuery);
     });
   }
 
@@ -75,18 +81,11 @@ export class AppComponent implements OnInit,OnDestroy {
     this.authSubscription?.unsubscribe();
   }
   
-  // updateAuthStatus(): void {
-  //   if (isPlatformBrowser(this.platformId)) {
-  //     const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  //     this.isLoggedIn = loggedIn;
-  //     this.isAdmin = loggedIn && (localStorage.getItem('isAdmin') === 'true');
-  //   } else {
-  //     this.isLoggedIn = false;
-  //     this.isAdmin = false;
-  //   }
-    
-  // }
-  
+  performSearch(query: string): void {
+    console.log('Keresés indítása:', query);
+    // Itt hajtsd végre a keresési logikát
+  }
+
   logout(): void {
     this.authService.signOut();
   }

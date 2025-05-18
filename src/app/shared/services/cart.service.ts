@@ -157,7 +157,7 @@ export class CartService {
         this.cartItems = this.cartItems.filter(item => item.user_id !== userId);
         this.cartSubject.next([...this.cartItems]);
       }
-  
+      window.location.reload(); // Refresh the page to reflect changes
     } catch (error) {
       console.error(`Error during checkout for user_id ${userId}:`, error);
     }

@@ -5,16 +5,21 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSidenav } from '@angular/material/sidenav';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { Auth } from '@angular/fire/auth';
+import { AuthService } from '../services/auth.service';
+import { Subscription } from 'rxjs';
 
 
 @Component({
   selector: 'app-menu',
+  standalone: true,
   imports: [
     CommonModule,
     RouterLink,
     RouterLinkActive,
     MatListModule,
-    MatIconModule
+    MatIconModule,
+  
   ],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss'
@@ -24,19 +29,28 @@ export class MenuComponent implements OnInit, AfterViewInit {
   @Input() isLoggedIn: boolean = false;
   @Input() isAdmin: boolean = false;
   @Output() logoutEvent = new EventEmitter<void>();
+  private authSubscription?: Subscription;
 
-  constructor() {
+  constructor(
+    private authService: AuthService,
+  ) {
     // console.log("constructor called");
   }
 
   ngOnInit(): void {
     this.checkLoginStatus();
-    this.checkAdminStatus();
+    this.authSubscription = this.authService.currentUser.subscribe(user => {
+      this.isLoggedIn = !!user;
+      localStorage.setItem('isLoggedIn', this.isLoggedIn ? 'true' : 'false');
+      this.isAdmin = user?.email == "admin@gmail.com" || false;
+    });
+    
   }
 
   ngAfterViewInit(): void {
     // console.log("ngAfterViewInit called");
   }
+  
   
   closeMenu() {
     if (this.sidenav) {
@@ -54,12 +68,7 @@ export class MenuComponent implements OnInit, AfterViewInit {
     }
   }
   checkAdminStatus() {
-    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-      const isAdmin = localStorage.getItem('isAdmin');
-      this.isAdmin = isAdmin === 'true';
-    } else {
-      this.isAdmin = false;
-    }
+    
   }
 
   logout() {

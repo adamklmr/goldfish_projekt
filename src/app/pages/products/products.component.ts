@@ -14,6 +14,7 @@ import { CartService } from '../../shared/services/cart.service';
 import { CurrencyPipePipe } from '../../shared/pipes/currency.pipe.pipe';
 import { AuthService } from '../../shared/services/auth.service';
 import {MatRadioModule} from '@angular/material/radio';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-products',
@@ -28,6 +29,7 @@ import {MatRadioModule} from '@angular/material/radio';
     MatInputModule,
     CurrencyPipePipe,
     MatRadioModule,
+    MatSnackBarModule
   ],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.scss']
@@ -44,35 +46,46 @@ export class ProductsComponent implements OnInit{
   constructor(
     private productService: ProductService,
     private cartService: CartService,
-    private authService: AuthService) {}
+    private authService: AuthService,
+    private snackBar: MatSnackBar
+  ) {}
 
-  async ngOnInit(): Promise<void> {
-    this.productService.getAllProducts().subscribe({
-      next: (data) => {
-        this.products = data;
-        this.isLoading = false;
-        this.filteredProducts = data;
-      },
-      error: (err) => {
-        console.error('Error loading products:', err);
-        this.isLoading = false;
-      }
-    });
+  ngOnInit(): void {
+    this.loadadProducts();
+    this.loadUserData();
+  } 
+  async loadUserData(): Promise<void> {
     try {
-      this.currentUser = await this.authService.getCurrentUserId(); // Fetch the current user
+      this.currentUser = await this.authService.getCurrentUser();
       console.log('Current user:', this.currentUser);
+      console.log('User events:', this.currentUser.events);
     } catch (error) {
       console.error('Error fetching current user:', error);
     }
   }
+  loadadProducts(): void 
+  {
+    this.productService.getAllProducts().subscribe({
+    next: (data) => {
+      this.products = data;
+      this.isLoading = false;
+      this.filteredProducts = data;
+    },
+    error: (err) => {
+      console.error('Error loading products:', err);
+      this.isLoading = false;
+    }
+    });
+  } 
+
 
 
  
   
   addToCart(product: Product): void {
     if (this.currentUser !== null) {
-      this.cartService.addToCart(product.id, this.currentUser);
-      alert(`${product.name} hozzáadva a kosárhoz!`);
+      this.cartService.addToCart(product.id, this.currentUser.id);
+      this.showNotification('A terméket hozzáadtad a kosárhoz!', 'success');
     } else {
       console.error('User is not logged in.');
       alert('Please log in to add items to the cart.');
@@ -100,7 +113,14 @@ export class ProductsComponent implements OnInit{
     }
     return products;
   }
-  
+  private showNotification(message: string, type: 'success' | 'error' | 'warning'): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 3000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom',
+      panelClass: [`snackbar-${type}`]
+    });
+  } 
   // trackByIndex(index: number, item: any): number {
   //   return index;
   // }

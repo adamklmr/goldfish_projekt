@@ -48,7 +48,7 @@
                             [ngClass]="{ 'disabled-button': hasStarted(event.startDate) }" 
                             [disabled]="hasStarted(event.startDate)"
                             (click)="toggleInterest(event.id)"
-                            >Érdekel</button>
+                            >{{ isUserInterested(event.id) ? 'Már nem érdekel' : 'Érdekel' }}</button>
                           </mat-card-actions>
                 </mat-card>
             </div>

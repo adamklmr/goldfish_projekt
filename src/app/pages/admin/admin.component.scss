@@ -34,8 +34,13 @@ h2{
     text-decoration: line-through;
   color: gray;
 }
-@media (max-width: 490px){
-    table{
-        max-width: 70%;
+@media (max-width: 630px){
+    .table{
+        display:block;
+        overflow-x: auto;
+        white-space: nowrap;
+   
+        box-sizing: border-box;
+        font-size: smaller;
     }
 }

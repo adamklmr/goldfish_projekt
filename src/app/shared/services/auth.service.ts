@@ -8,7 +8,6 @@ import {
   UserCredential,
   createUserWithEmailAndPassword
 } from '@angular/fire/auth';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { 
   Firestore, 
   collection, 
@@ -16,11 +15,12 @@ import {
   setDoc,
   updateDoc,
   getDoc,
-  deleteDoc
+  deleteDoc,
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { User } from '../models/User';
+import { privateDecrypt } from 'crypto';
 
 @Injectable({
   providedIn: 'root'
@@ -31,13 +31,14 @@ export class AuthService {
   constructor(
     private auth: Auth,
     private firestore: Firestore,
-    private router: Router,
+    private router: Router
     
   ) {
     this.currentUser = authState(this.auth);
   }
   isAdmin(): boolean {
     const user = this.auth.currentUser;
+    console.log('Current user:', user);
     return user?.email === 'admin@gmail.com';
   }
   
@@ -148,5 +149,26 @@ export class AuthService {
       console.error("No user is currently signed in.");
       throw new Error("No user is currently signed in.");
     }
+  }
+  getCurrentUser(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.auth.onAuthStateChanged(async (user) => {
+        if (user) {
+          try {
+            const userDocRef = doc(this.firestore, 'users', user.uid);
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+              resolve({ id: user.uid, ...userDocSnap.data() });
+            } else {
+              reject('User document does not exist');
+            }
+          } catch (error: unknown) {
+            reject(error);
+          }
+        } else {
+          reject('No user signed in');
+        }
+      });
+    });
   }
 }

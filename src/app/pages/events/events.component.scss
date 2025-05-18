@@ -25,9 +25,12 @@
     // border: 5px solid black ;
     
 }
-img{
+.event-image img{
+    display: flex;
     max-height: 300px;
-    max-width: 300px;
+    // max-width: 100%;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
 }
   
 
@@ -42,6 +45,7 @@ img{
         width: 100%;
     }
 }
+
 .disabled-button {
     background-color: #ccc;
     color: #666;

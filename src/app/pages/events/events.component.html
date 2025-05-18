@@ -28,8 +28,9 @@
           <button mat-flat-button
             [ngClass]="{ 'disabled-button': hasStarted(event.startDate) }" 
             [disabled]="hasStarted(event.startDate)"
-            (click)="toggleInterest(event.id)">
-            Érdekel
+            (click)="toggleInterest(event.id)"
+            >
+            {{ isUserInterested(event.id) ? 'Már nem érdekel' : 'Érdekel' }}
           </button>
         </mat-card-actions>
       </mat-card>

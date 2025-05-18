@@ -129,18 +129,6 @@
         width: 100%;
     }
 }
-@media (max-width: 815px) {
-    .event-image img{
-        width: 350px;
-    }
-}
-
-@media (max-width: 462px) {
-    .products-container{
-        justify-content: center;
-        margin-left: 0px;
-    }
-}
 .disabled-button {
     background-color: #ccc;
     color: #666;

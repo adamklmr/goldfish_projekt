@@ -86,6 +86,7 @@ export class EventService {
       })
     );
   }
+
   getEventsByUserId(userId: string): Observable<Event[]> {
     const eventsCollection = collection(this.firestore, this.EVENT_COLLECTION);
     const q = query(eventsCollection, where('userId', '==', userId), orderBy('startDate'));
@@ -153,6 +154,7 @@ export class EventService {
       console.error(`Error adding interest:`, error);
       throw error;
     }
+    window.location.reload();
   }
 
 async removeInterest(userId: string, eventId: string): Promise<void> {
@@ -166,6 +168,7 @@ async removeInterest(userId: string, eventId: string): Promise<void> {
     console.error(`Error removing interest:`, error);
     throw error;
   }
+  window.location.reload();
 }
 
 async isInterested(userId: string, eventId: string): Promise<boolean> {
