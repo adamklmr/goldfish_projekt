@@ -103,6 +103,15 @@ export class EventService {
   async updateEvent(eventId: string, updatedEvent: Partial<Event>): Promise<void> {
     try {
       const eventDocRef = doc(this.firestore, this.EVENT_COLLECTION, eventId);
+
+      // Ensure startDate and endDate are properly formatted if they exist
+      if (updatedEvent.startDate) {
+        updatedEvent.startDate = this.formatDateToString(updatedEvent.startDate as string);
+      }
+      if (updatedEvent.endDate) {
+        updatedEvent.endDate = this.formatDateToString(updatedEvent.endDate as string);
+      }
+
       await updateDoc(eventDocRef, updatedEvent);
     } catch (error) {
       console.error('Error updating event:', error);

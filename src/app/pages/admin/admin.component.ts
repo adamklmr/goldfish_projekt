@@ -56,8 +56,8 @@ import { getDownloadURL, getStorage, ref, uploadBytes } from '@angular/fire/stor
 export class AdminComponent implements OnInit, OnDestroy {
   productForm!: FormGroup;
   eventForm!: FormGroup;
-  ProductsdisplayedColumns: string[] = ['pic','instock', 'name', 'category', 'price', 'description','action'];
-  EventsdisplayedColumns: string[] = ['pic','name', 'startDate', 'endDate', 'location', 'description','action'];
+  ProductsdisplayedColumns: string[] = ['pic','instock', 'name', 'category', 'price', 'description','action','edit'];
+  EventsdisplayedColumns: string[] = ['pic','name', 'startDate', 'endDate', 'location', 'description','action','edit'];
   products: Product[] = [];
   events: Event[] = [];
   form!: FormGroup;
@@ -70,6 +70,11 @@ export class AdminComponent implements OnInit, OnDestroy {
   currentUser: any = null;
   selectedImageFile: File | null = null;
   selectedImageFileEvent: File | null = null;
+  selectedProduct: Product | null = null;
+  selectedEvent: Event | null = null;
+  editMode: boolean = false;
+  editProductId: string | null = null;
+  editEventId: string | null = null;
   
   private subscriptions: Subscription[] = [];
   @ViewChild(MatPaginator) paginator: MatPaginator | null = null;
@@ -123,9 +128,20 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   async addProduct(): Promise<void> {
+
     if(this.productForm.invalid || !this.selectedImageFile) {
       return;
     }
+
+    if (this.editMode && this.editProductId) {
+      const productData = this.productForm.value;
+      // Update existing product
+      this.productService.updateProduct(this.editProductId, productData).then(() => {
+        this.loadAllProducts(); // Refresh product list
+        this.showNotification('Product updated successfully', 'success');
+        this.productForm.reset();
+      });
+    }else{
     if (this.productForm.valid) {
 
     
@@ -159,11 +175,21 @@ export class AdminComponent implements OnInit, OnDestroy {
       this.showNotification('Form is invalid. Please check your input.', 'error');
     }
   }
+  }
 
   async addEvent(): Promise<void> {
     if(this.eventForm.invalid || !this.selectedImageFileEvent) {
       return;
     }
+    if (this.editMode && this.editEventId) {
+      const eventData = this.eventForm.value;
+      // Update existing product
+      this.eventService.updateEvent(this.editEventId, eventData).then(() => {
+        this.loadAllEvents(); // Refresh product list
+        this.showNotification('Event updated successfully', 'success');
+        this.eventForm.reset();
+      });
+    }else{
     if (this.eventForm.valid) {
       const filePath = `esemenyek/${Date.now()}_${this.selectedImageFileEvent.name}`;
       const storage = getStorage();
@@ -190,7 +216,10 @@ export class AdminComponent implements OnInit, OnDestroy {
       }).catch(error => {
         console.error('Error adding event:', error);
       });
+    }else {
+      this.showNotification('Form is invalid. Please check your input.', 'error');
     }
+  }
   }
 
   toggleProductCompletion(product: Product): void {
@@ -202,6 +231,7 @@ export class AdminComponent implements OnInit, OnDestroy {
       this.showNotification(message,'success');
     }).catch(error => {
       console.error('Error updating product:', error);
+      this.showNotification('Error adding product', 'error');
     });
   }
 
@@ -252,6 +282,81 @@ export class AdminComponent implements OnInit, OnDestroy {
       });
     }
   }
+
+  editProduct(product: Product): void {
+    this.editMode = true;
+    this.editProductId = product.id; 
+    // Populate the form with the selected product's data
+    this.productForm.patchValue({
+      name: product.name,
+      price: product.price,
+      description: product.description,
+      category: product.category,
+      stock: product.instock,
+     
+    });
+  
+    // Store the selected product for updates
+    this.selectedProduct = product;
+  }
+  editEvent(event: Event): void {
+    this.editMode = true;
+    this.editEventId = event.id; 
+    // Populate the form with the selected event's data
+    this.eventForm.patchValue({
+      name: event.name,
+      startDate: event.startDate,
+      endDate: event.endDate,
+      location: event.location,
+      description: event.description
+    });
+  
+    // Store the selected product for updates
+    this.selectedEvent = event;
+  }
+
+  // updateProduct(product: Product): void {
+  //   if (this.productForm.invalid) {
+  //     this.showNotification('Form is invalid. Please check your input.', 'error');
+  //     return;
+  //   }
+
+  //   const updatedProduct = {
+  //     ...product,
+  //     ...this.productForm.value
+  //   };
+
+  //   if (this.selectedImageFile) {
+  //     const filePath = `termekek/${Date.now()}_${this.selectedImageFile.name}`;
+  //     const storage = getStorage();
+  //     const storageRef = ref(storage, filePath);
+
+  //     uploadBytes(storageRef, this.selectedImageFile).then(() => {
+  //       return getDownloadURL(storageRef);
+  //     }).then((downloadURL) => {
+  //       updatedProduct.pic = downloadURL;
+  //       return this.productService.updateProduct(product.id, updatedProduct);
+  //     }).then(() => {
+  //       this.loadAllProducts();
+  //       this.showNotification('Product updated successfully', 'success');
+  //       this.productForm.reset();
+  //       this.selectedImageFile = null;
+  //     }).catch(error => {
+  //       console.error('Error updating product:', error);
+  //       this.showNotification('Error updating product', 'error');
+  //     });
+  //   } else {
+  //     this.productService.updateProduct(product.id, updatedProduct).then(() => {
+  //       this.loadAllProducts();
+  //       this.showNotification('Product updated successfully', 'success');
+  //       this.productForm.reset();
+  //     }).catch(error => {
+  //       console.error('Error updating product:', error);
+  //       this.showNotification('Error updating product', 'error');
+  //     });
+  //   }
+  // }
+
   private showNotification(message: string, type: 'success' | 'error' | 'warning'): void {
     this.snackBar.open(message, 'Close', {
       duration: 3000,
