@@ -88,7 +88,7 @@ export class ProfileComponent implements OnInit,OnDestroy {
     const firstInitial = this.user.name.firstname ? this.user.name.firstname.charAt(0).toUpperCase() : '';
     const lastInitial = this.user.name.lastname ? this.user.name.lastname.charAt(0).toUpperCase() : '';
     
-    return firstInitial + (lastInitial ? lastInitial : '');
+    return lastInitial + (firstInitial ? firstInitial : '');
   }
   async onDeleteUser(): Promise<void> {
     if (this.user?.email === 'admin@gmail.com') {
