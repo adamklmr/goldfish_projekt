@@ -30,7 +30,7 @@ export class ProductService {
       const productToSave = {
         ...product,
         instock: true,
-        pic: 'assets/images/products/test.png' // Default image path
+        // pic: 'assets/images/products/test.png' // Default image path
       };
       const docRef = await addDoc(productsCollection, productToSave);
       const productId = docRef.id;
@@ -47,7 +47,16 @@ export class ProductService {
       throw error;
     }
   }
-
+  // async addProduct(product: any): Promise<void> {
+  //   try{
+  //     const termekekCollection = collection(this.firestore, "products");
+  //     await addDoc(termekekCollection, product);
+  //     console.log("Product added successfully");
+  //   } catch (error) {
+  //     console.error("Error adding product:", error);
+  //     throw error;
+  //   }
+  // }
   //READ
   getAllProductsAdmin(): Observable<Product[]> {
     return from(getDocs(collection(this.firestore, this.PRODUCT_COLLECTION))).pipe(

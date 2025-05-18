@@ -23,6 +23,8 @@ import { EventService } from '../../shared/services/event.service';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 import { AuthService } from '../../shared/services/auth.service';
+import { getDownloadURL, getStorage, ref, uploadBytes } from '@angular/fire/storage';
+
 
 
 @Component({
@@ -66,6 +68,8 @@ export class AdminComponent implements OnInit, OnDestroy {
   pagedProducts: any[] = [];
   pagedEvents: any[] = [];
   currentUser: any = null;
+  selectedImageFile: File | null = null;
+  selectedImageFileEvent: File | null = null;
   
   private subscriptions: Subscription[] = [];
   @ViewChild(MatPaginator) paginator: MatPaginator | null = null;
@@ -87,14 +91,13 @@ export class AdminComponent implements OnInit, OnDestroy {
       price: [0, [Validators.required, Validators.min(0)]],
       description: [''],
       instock: [true],
-      pic: ['']
+      
     });
     this.eventForm = this.fb.group({
       name: ['', Validators.required],
       startDate: ['', Validators.required],
       endDate: ['', Validators.required],
       location: ['', Validators.required],
-      pic: [''],
       description: ['']
     });
     this.form = this.fb.group({
@@ -119,14 +122,35 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
-  addProduct(): void {
+  async addProduct(): Promise<void> {
+    if(this.productForm.invalid || !this.selectedImageFile) {
+      return;
+    }
     if (this.productForm.valid) {
-      const newProduct = this.productForm.value;
+
+    
+      const filePath = `termekek/${Date.now()}_${this.selectedImageFile.name}`;
+      const storage = getStorage();
+      const storageRef = ref(storage, filePath);
+      await uploadBytes(storageRef, this.selectedImageFile);
+      const downloadURL = await getDownloadURL(storageRef);
+
+      const { name, category, price, description, instock } = this.productForm.value;
+      const newProduct = {
+        name,
+        category,
+        price,
+        description,
+        instock,
+        pic: downloadURL
+      };
 
       this.productService.addProduct(newProduct).then(() => {
         this.loadAllProducts();
         this.showNotification('Product added successfully', 'success');
         this.productForm.reset();
+        this.selectedImageFile = null;
+
       }).catch(error => {
         console.error('Error adding product:', error);
         this.showNotification('Error adding product', 'error');
@@ -136,12 +160,28 @@ export class AdminComponent implements OnInit, OnDestroy {
     }
   }
 
-  addEvent(): void {
+  async addEvent(): Promise<void> {
+    if(this.eventForm.invalid || !this.selectedImageFileEvent) {
+      return;
+    }
     if (this.eventForm.valid) {
-      const newEvent = this.eventForm.value;
-
-      const startDate = this.eventForm.get('startDate')?.value;
-      const endDate = this.eventForm.get('endDate')?.value;
+      const filePath = `esemenyek/${Date.now()}_${this.selectedImageFileEvent.name}`;
+      const storage = getStorage();
+      const storageRef = ref(storage, filePath);
+      await uploadBytes(storageRef, this.selectedImageFileEvent);
+      const downloadURL = await getDownloadURL(storageRef);
+      
+      // const eventStartDate = this.eventForm.value.startDate;
+      // const eventEndDate = this.eventForm.value.endDate;
+      const { name, startDate, endDate, location, description } = this.eventForm.value;
+      const newEvent = {
+        name,
+        startDate,
+        endDate,
+        location,
+        description,
+        pic: downloadURL
+      };
 
       this.eventService.addEvent(newEvent).then(() => {
         this.loadAllEvents();
@@ -175,6 +215,7 @@ export class AdminComponent implements OnInit, OnDestroy {
       console.error('Error loading products:', error);
     });
     this.subscriptions.push(subscription);
+    this.updatePagedProducts();
   }
 
   loadAllEvents(): void {
@@ -229,14 +270,11 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.pageSize = event.pageSize;
     this.updatePagedProducts();
   }
-  // updatePagedEvents(){
-  //   const start = this.pageIndexEvents * this.pageSize;
-  //   const end = start + this.pageSize;
-  //   this.pagedEvents = this.events.slice(start, end);
-  // }
-  // onPageChangeEvents(event: PageEvent) {
-  //   this.pageIndex = event.pageIndexEvents;
-  //   this.pageSize = event.pageSize;
-  //   this.updatePagedEvents();
-  // }
+  onImageSelectedProduct(event: any): void {
+    this.selectedImageFile = event.target.files[0] || null;
+  }
+  onImageSelectedEvent(event: any): void {
+    this.selectedImageFileEvent = event.target.files[0] || null;
+  }
+  
 }

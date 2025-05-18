@@ -45,7 +45,7 @@ export class EventService {
         ...event,
         startDate: this.formatDateToString(event.startDate as string),
         endDate: this.formatDateToString(event.endDate as string),
-        pic: 'assets/images/events/testevent.png' // Default image path
+        // pic: 'assets/images/events/testevent.png' // Default image path
       };
       
       const docRef = await addDoc(eventsCollection, eventToSave);
