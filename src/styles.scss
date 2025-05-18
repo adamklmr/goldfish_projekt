@@ -37,6 +37,14 @@
     calendar-date-selected-state-background-color: #58a7b3,
     calendar-date-today-outline-color: #58a7b3,
   ));
+  @include mat.radio-overrides((
+    unselected-hover-icon-color: #306470,
+    selected-icon-color: #438797,
+    selected-focus-icon-color: #438797,
+    selected-hover-icon-color: #306470,
+    selected-pressed-icon-color: #438797,
+    ripple-color: #58a7b3,
+  ));
 }
 body {
   margin: 0 !important;
